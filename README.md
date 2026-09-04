@@ -36,8 +36,8 @@ You can also **burn your EQ profile straight into the cable's onboard EEPROM fla
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/<your-username>/tanchjim-bunny-dsp.git
-cd tanchjim-bunny-dsp
+git clone https://github.com/onbot7/BunnyDSPLinux
+cd BunnyDSPLinux
 
 # 2. Grant non-root access and link tanchjim-ctl into PATH
 sudo ./install-rules.sh --path
