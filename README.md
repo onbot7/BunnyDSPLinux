@@ -1,4 +1,4 @@
-# Tanchjim Bunny DSP Controller for Linux
+# Tanchjim Bunny DSP Controller for Linux (KT0210)
 <p align="center">
   <img src="ss/ss.png" alt="Equalizer Interface" width="900">
 </p>
