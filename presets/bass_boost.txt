@@ -1,0 +1,6 @@
+Preamp: -4.0 dB
+Filter 1: ON LSQ Fc 60 Hz Gain 4.5 dB Q 0.70
+Filter 2: ON PK Fc 220 Hz Gain 1.0 dB Q 1.00
+Filter 3: ON PK Fc 1000 Hz Gain 0.0 dB Q 1.00
+Filter 4: ON PK Fc 3000 Hz Gain 0.0 dB Q 1.00
+Filter 5: ON PK Fc 8000 Hz Gain 0.0 dB Q 1.00

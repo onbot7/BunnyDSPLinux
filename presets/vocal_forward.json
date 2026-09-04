@@ -1,0 +1,15 @@
+{
+  "name": "Vocal Forward (J-Pop / K-Pop / Acoustic)",
+  "description": "Brings forward male and female vocals with intimacy, clarity, and air",
+  "pregain": -2.0,
+  "bands": [
+    {"band": 0, "freq": 80, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 1, "freq": 150, "gain": -1.0, "q": 1.0, "type": "PK"},
+    {"band": 2, "freq": 500, "gain": 0.5, "q": 1.0, "type": "PK"},
+    {"band": 3, "freq": 1000, "gain": 1.5, "q": 1.4, "type": "PK"},
+    {"band": 4, "freq": 2800, "gain": 2.5, "q": 1.8, "type": "PK"},
+    {"band": 5, "freq": 4500, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 6, "freq": 5500, "gain": -1.5, "q": 2.0, "type": "PK"},
+    {"band": 7, "freq": 12000, "gain": 1.5, "q": 1.0, "type": "HSQ"}
+  ]
+}

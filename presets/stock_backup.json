@@ -1,0 +1,41 @@
+{
+  "slot": 3,
+  "pregain": 0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 150,
+      "gain": -4.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 1300,
+      "gain": 1.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 6000,
+      "gain": -4.0,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 12000,
+      "gain": -8.0,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 13500,
+      "gain": 11.0,
+      "q": 3.0,
+      "type": "PK"
+    }
+  ]
+}

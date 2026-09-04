@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open / TANCHJIM BUNNY DSP</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --sidebar-bg: #050505;
+      --card-bg: #080808;
+      --card-inner: #040404;
+      --border: #181818;
+      --border-light: #242424;
+      --text: #ffffff;
+      --text-muted: #737373;
+      --text-dim: #404040;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --curve-color: #f8fafc;
+      --green: #10b981;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Sidebar navigation */
+    aside {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      padding: 24px 16px;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 0 8px;
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .brand-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .device-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .device-card:hover { border-color: var(--border-light); }
+    .device-card.active {
+      border-color: #2a2a2a;
+      background: #0b0b0b;
+    }
+    .device-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .device-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+    .device-dot.connected {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+    .device-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .device-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding-left: 15px;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-item:hover {
+      color: var(--text);
+      background: #111111;
+    }
+    .nav-item.active {
+      color: var(--text);
+      background: #141414;
+      border: 1px solid var(--border);
+    }
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    /* Main dashboard layout */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px 32px;
+      gap: 18px;
+      background: #000000;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .top-header-meta {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .top-header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding-top: 6px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+    .status-dot.connected {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    /* Hero Grid */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 16px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .btn-connect {
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-connect:hover {
+      background: #e5e5e5;
+    }
+
+    .btn-action {
+      background: #111111;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-action:hover {
+      background: #1a1a1a;
+      border-color: var(--border-light);
+    }
+    .btn-action.primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+    .btn-action.primary:hover {
+      background: #0369a1;
+    }
+
+    /* Response curve canvas */
+    .graph-outer {
+      position: relative;
+      background: #000000;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+      height: 310px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .graph-hint {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: #555555;
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Right Info Card */
+    .info-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .info-block {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .info-sub {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+    .info-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+    .info-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* 8-band channel strip grid */
+    .section-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .indicator-cyan {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .section-title {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 1400px) {
+      .channels-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .channels-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .channel-strip {
+      background: #030303;
+      border: 1px solid #171717;
+      border-radius: 6px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.15s;
+    }
+    .channel-strip:hover, .channel-strip:focus-within {
+      border-color: #2a2a2a;
+    }
+    .channel-strip.active-drag {
+      border-color: var(--accent);
+      background: #080a0e;
+    }
+
+    .channel-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #141414;
+    }
+    .band-label {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .type-select {
+      background: #111111;
+      color: var(--text);
+      border: 1px solid #222222;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .knob-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .knob-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+    .knob-val {
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 3px;
+      border-radius: 2px;
+      background: #202020;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Audio Controls Row */
+    .controls-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 900px) {
+      .controls-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .control-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #030303;
+      border: 1px solid #171717;
+      border-radius: 6px;
+      padding: 10px 16px;
+      gap: 16px;
+    }
+    .control-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .control-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .control-inputs {
+      flex: 1;
+      max-width: 300px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Preset quick-selector footer */
+    .bottom-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .preset-pill-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: #0f0f0f;
+      border: 1px solid #202020;
+      color: #888888;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill:hover {
+      color: #ffffff;
+      border-color: #383838;
+      background: #181818;
+    }
+    .pill.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .toast {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* Import Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #0a0a0a;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      max-width: 560px;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: #000000;
+      border: 1px solid #242424;
+      border-radius: 6px;
+      padding: 10px;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      resize: vertical;
+      outline: none;
+    }
+    .info-btn {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0d0d0d;
+      border: 1px solid #242424;
+      color: #666666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.2s;
+    }
+    .info-btn:hover {
+      color: #ffffff;
+      border-color: #444444;
+      background: #181818;
+      transform: scale(1.06);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left Sidebar -->
+  <aside>
+    <div class="brand">
+      <span class="brand-title">Open</span>
+      <span class="brand-sub">/ TANCHJIM</span>
+    </div>
+
+    <div>
+      <div class="sidebar-section-title">Connected Device</div>
+      <div class="device-card active" id="deviceCard">
+        <div class="device-card-header">
+          <div class="device-dot" id="sidebarDot"></div>
+          <span class="device-name">TANCHJIM BUNNY DSP</span>
+        </div>
+        <span class="device-sub" id="sidebarSub">Click to Connect</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-title">Navigation</div>
+      <ul class="nav-list">
+        <li class="nav-item active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+          Overview
+        </li>
+        <li class="nav-item" id="navImportBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+          AutoEQ Import
+        </li>
+        <li class="nav-item" id="navExportBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+          Backup Profile
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main>
+    <!-- Top Header -->
+    <div class="top-header">
+      <div>
+        <div class="top-header-title">TANCHJIM BUNNY DSP</div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot" id="topStatusDot"></div>
+        <span id="topStatusText">Disconnected</span>
+      </div>
+    </div>
+
+    <!-- Hero Matrix Section -->
+    <div class="hero-grid">
+      <!-- Matrix Canvas Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-label">Response Curve</span>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-connect" id="connectHidBtn">Connect HID</button>
+            <button class="btn-action primary" id="burnFlashBtn">Save Flash</button>
+          </div>
+        </div>
+
+        <div class="graph-outer" id="graphOuter">
+          <canvas id="eqCanvas"></canvas>
+          <div class="graph-hint">Drag: Freq &amp; Gain | Scroll: Q</div>
+        </div>
+      </div>
+
+      <!-- Right Info Card -->
+      <div class="card info-card">
+        <div class="info-block">
+          <span class="info-sub">CHIP</span>
+          <span class="info-val">KT02xx</span>
+        </div>
+
+        <div class="info-block">
+          <span class="info-sub">STATUS</span>
+          <span class="info-val" id="infoConnVal">Disconnected</span>
+          <span class="info-desc" id="infoConnDesc">Click Connect to attach</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Channel Strips Card -->
+    <div class="card">
+      <div class="section-bar">
+        <div class="section-title-wrap">
+          <div class="indicator-cyan"></div>
+          <span class="section-title">Parametric Bands</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-action" id="resetFlatBtn">Reset Flat</button>
+          <button class="btn-action" id="loadPresetFileBtn">Load File</button>
+          <button class="btn-action" id="savePresetFileBtn">Save File</button>
+          <button class="btn-action" id="openImportModalBtn">Import Text</button>
+          <input type="file" id="presetFileInput" accept=".json,.txt" style="display:none;">
+        </div>
+      </div>
+
+      <!-- Controls Row: Preamp & Mic Gain -->
+      <div class="controls-row">
+        <div class="control-strip">
+          <div class="control-info">
+            <span class="control-title">Preamp</span>
+          </div>
+          <div class="control-inputs">
+            <input type="range" id="pregainSlider" min="-12" max="6" step="0.5" value="0">
+            <span class="knob-val" id="pregainVal" style="width:55px; text-align:right;">0.0 dB</span>
+          </div>
+        </div>
+
+        <div class="control-strip">
+          <div class="control-info">
+            <span class="control-title">Mic Gain</span>
+          </div>
+          <div class="control-inputs">
+            <input type="range" id="micGainSlider" min="0" max="100" step="1" value="100">
+            <span class="knob-val" id="micGainVal" style="width:55px; text-align:right;">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 Channel Strips -->
+      <div class="channels-grid" id="channelsContainer"></div>
+    </div>
+
+    <!-- Bottom Inspector / Presets -->
+    <div class="bottom-card">
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <span class="card-label">Presets</span>
+        <div class="preset-pill-group">
+          <button class="pill" data-preset="harman">Harman IEM 2019v2</button>
+          <button class="pill" data-preset="bass">Bass Boost (+4.5dB)</button>
+          <button class="pill" data-preset="vocal">Vocal Forward</button>
+          <button class="pill" data-preset="treble">Treble Tame</button>
+          <button class="pill" data-preset="flat">Flat Neutral</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toastMsg">Ready. Click Connect to read active filters.</div>
+    </div>
+  </main>
+
+  <!-- AutoEQ Import Modal -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-box">
+      <div class="card-header">
+        <span class="card-label">Import Parametric EQ</span>
+        <button class="btn-action" id="closeImportModalBtn">Close</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">
+          Load file (.json / .txt) or paste AutoEq / Peace text:
+        </p>
+        <button class="btn-action" id="modalChooseFileBtn">Choose File</button>
+      </div>
+      <textarea id="importText" placeholder="Preamp: -3.5 dB&#10;Filter 1: ON LSQ Fc 45 Hz Gain 4.5 dB Q 0.7&#10;Filter 2: ON PK Fc 180 Hz Gain -1.5 dB Q 1.0&#10;..."></textarea>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <button class="btn-action" id="exportTxtBtn">Export .txt</button>
+        <button class="btn-action primary" id="applyImportBtn">Apply to Sliders</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credits Modal -->
+  <div class="modal-backdrop" id="creditsModal">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="card-header">
+        <span class="card-label">Credits &amp; System Setup</span>
+        <button class="btn-action" id="closeCreditsModalBtn">Close</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px; font-size:0.82rem; color:var(--text); line-height:1.6;">
+        <div>
+          <div style="font-weight:600; color:#ffffff; margin-bottom:4px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">UI Design</div>
+          <div>Web UI design inspired by <span style="color:#ffffff; font-weight:600;">not_ayan99</span>'s <a href="https://openaula.vercel.app/" target="_blank" rel="noopener noreferrer" style="color:#38bdf8; text-decoration:none;">OpenAula</a> (<a href="https://openaula.vercel.app/" target="_blank" rel="noopener noreferrer" style="color:#38bdf8; text-decoration:none;">https://openaula.vercel.app/</a>).</div>
+        </div>
+
+        <div style="border-top:1px solid #1c1c1c; padding-top:10px;">
+          <div style="font-weight:600; color:#ffffff; margin-bottom:4px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">Hardware Driver</div>
+          <div style="color:var(--text-muted);">Tanchjim Bunny DSP (KTMicro KT0210) 8-band hardware PEQ controller &amp; WebHID bridge for Linux.</div>
+        </div>
+
+        <div style="border-top:1px solid #1c1c1c; padding-top:10px;">
+          <div style="font-weight:600; color:#ffffff; margin-bottom:6px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">NixOS One-Liner (configuration.nix)</div>
+          <div style="display:flex; align-items:center; gap:6px; background:#080808; border:1px solid #222; border-radius:4px; padding:6px 10px;">
+            <code id="nixosSnippet" style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"'';</code>
+            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('services.udev.extraRules = \'\'SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;31b2&quot;, ATTRS{idProduct}==&quot;1112&quot;, MODE=&quot;0666&quot;, TAG+=&quot;uaccess&quot;\'\';', this)">Copy</button>
+          </div>
+          <div style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">Then run <code style="color:#ffffff; font-family:var(--font-mono);">sudo nixos-rebuild switch</code> (if <code style="color:#fff; font-family:var(--font-mono);">extraRules</code> already exists, append rule inside existing quotes).</div>
+        </div>
+
+        <div style="border-top:1px solid #1c1c1c; padding-top:10px;">
+          <div style="font-weight:600; color:#ffffff; margin-bottom:6px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">Universal Setup (Ubuntu / Arch / Fedora / Debian / openSUSE / Void / Alpine)</div>
+          <div style="display:flex; align-items:center; gap:6px; background:#080808; border:1px solid #222; border-radius:4px; padding:6px 10px;">
+            <code style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">sudo ./install-rules.sh --path</code>
+            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('sudo ./install-rules.sh --path', this)">Copy</button>
+          </div>
+          <div style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;"><code style="color:#fff; font-family:var(--font-mono);">--path</code> automatically symlinks <code style="color:#fff; font-family:var(--font-mono);">tanchjim-ctl</code> into <code style="color:#fff; font-family:var(--font-mono);">/usr/local/bin</code> so you can run it anywhere.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom-Right Info Symbol -->
+  <button class="info-btn" id="openCreditsModalBtn" title="Credits &amp; Info" aria-label="Credits">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  </button>
+
+  <script>
+    // Working profile and active filter state
+    let hidDevice = null;
+    let useBackend = false;
+
+    let state = {
+      pregain: 0.0,
+      bands: [
+        { freq: 150, gain: -4.5, q: 1.0, type: "PK" },
+        { freq: 1300, gain: 1.0, q: 1.0, type: "PK" },
+        { freq: 6000, gain: -4.0, q: 3.0, type: "PK" },
+        { freq: 12000, gain: -8.0, q: 3.0, type: "PK" },
+        { freq: 13500, gain: 11.0, q: 3.0, type: "PK" },
+        { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+        { freq: 4000, gain: 0.0, q: 1.0, type: "PK" },
+        { freq: 10000, gain: 0.0, q: 1.0, type: "PK" }
+      ]
+    };
+
+    const PRESETS = {
+      harman: {
+        pregain: -3.5,
+        bands: [
+          { freq: 45, gain: 4.5, q: 0.7, type: "LSQ" },
+          { freq: 180, gain: -1.5, q: 1.0, type: "PK" },
+          { freq: 500, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1200, gain: 1.2, q: 1.8, type: "PK" },
+          { freq: 3500, gain: -1.8, q: 2.2, type: "PK" },
+          { freq: 6000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 8500, gain: 2.0, q: 0.8, type: "HSQ" },
+          { freq: 12000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      bass: {
+        pregain: -4.0,
+        bands: [
+          { freq: 32, gain: 3.0, q: 1.0, type: "PK" },
+          { freq: 60, gain: 4.5, q: 0.7, type: "LSQ" },
+          { freq: 125, gain: 2.0, q: 1.0, type: "PK" },
+          { freq: 220, gain: 1.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 3000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 6000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 8000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      vocal: {
+        pregain: -2.0,
+        bands: [
+          { freq: 80, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 150, gain: -1.0, q: 1.0, type: "PK" },
+          { freq: 500, gain: 0.5, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 1.5, q: 1.4, type: "PK" },
+          { freq: 2800, gain: 2.5, q: 1.8, type: "PK" },
+          { freq: 4500, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 5500, gain: -1.5, q: 2.0, type: "PK" },
+          { freq: 12000, gain: 1.5, q: 1.0, type: "HSQ" }
+        ]
+      },
+      treble: {
+        pregain: 0.0,
+        bands: [
+          { freq: 60, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 100, gain: 1.0, q: 1.0, type: "PK" },
+          { freq: 500, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 2500, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 4500, gain: -1.5, q: 2.0, type: "PK" },
+          { freq: 6500, gain: -3.5, q: 3.0, type: "PK" },
+          { freq: 10000, gain: -2.0, q: 1.5, type: "HSQ" }
+        ]
+      },
+      flat: {
+        pregain: 0.0,
+        bands: [
+          { freq: 32, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 64, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 125, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 250, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 500, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 4000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 10000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      }
+    };
+
+    // KT0210 vendor HID communication (Report ID 0x4B)
+    const REPORT_ID = 0x4B;
+    const CMD_READ = 0x52;
+    const CMD_WRITE = 0x57;
+    const CMD_COMMIT = 0x53;
+
+    let pendingResponse = null;
+
+    function setupReportListener(device) {
+      device.addEventListener("inputreport", (e) => {
+        const data = new Uint8Array(e.data.buffer);
+        if (pendingResponse && data[0] === pendingResponse.reg && data[4] === pendingResponse.cmd) {
+          pendingResponse.resolve(data);
+          pendingResponse = null;
+        }
+      });
+    }
+
+    function sendReportAsync(reg, cmd, packet, timeoutMs = 1200) {
+      return new Promise(async (resolve, reject) => {
+        const timeout = setTimeout(() => {
+          if (pendingResponse) {
+            pendingResponse = null;
+            reject(new Error(`Timeout on reg 0x${reg.toString(16)}`));
+          }
+        }, timeoutMs);
+
+        pendingResponse = {
+          reg, cmd,
+          resolve: (data) => { clearTimeout(timeout); resolve(data); }
+        };
+
+        try {
+          await hidDevice.sendReport(REPORT_ID, packet);
+        } catch (err) {
+          clearTimeout(timeout);
+          pendingResponse = null;
+          reject(err);
+        }
+      });
+    }
+
+    async function webhidReadAll() {
+      const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_READ, 0, 0x03, 0, 0, 0]);
+      await sendReportAsync(0x24, CMD_READ, slotPkt);
+
+      const prePkt = new Uint8Array([0x66, 0, 0, 0, CMD_READ, 0, 0, 0, 0, 0]);
+      const preResp = await sendReportAsync(0x66, CMD_READ, prePkt);
+      let rawPregain = preResp[6];
+      state.pregain = rawPregain > 127 ? rawPregain - 256 : rawPregain;
+
+      for (let i = 0; i < 8; i++) {
+        const gfReg = 0x26 + i * 2;
+        const qtReg = gfReg + 1;
+
+        const gfPkt = new Uint8Array([gfReg, 0, 0, 0, CMD_READ, 0, 0, 0, 0, 0]);
+        const gfResp = await sendReportAsync(gfReg, CMD_READ, gfPkt);
+        const rawGain = gfResp[6] | (gfResp[7] << 8);
+        const gainSigned = rawGain > 0x7fff ? rawGain - 0x10000 : rawGain;
+        const freq = gfResp[8] | (gfResp[9] << 8);
+
+        const qtPkt = new Uint8Array([qtReg, 0, 0, 0, CMD_READ, 0, 0, 0, 0, 0]);
+        const qtResp = await sendReportAsync(qtReg, CMD_READ, qtPkt);
+        const rawQ = qtResp[6] | (qtResp[7] << 8);
+        const q = rawQ / 1000.0;
+        const typeCode = qtResp[8];
+        const typeStr = typeCode === 3 ? "LSQ" : (typeCode === 4 ? "HSQ" : "PK");
+
+        state.bands[i] = {
+          freq: freq,
+          gain: Math.round(gainSigned / 10 * 10) / 10,
+          q: Math.round(q * 1000) / 1000,
+          type: typeStr
+        };
+      }
+
+      renderUI();
+    }
+
+    async function webhidWriteAll() {
+      const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_WRITE, 0, 0x03, 0, 0, 0]);
+      await hidDevice.sendReport(REPORT_ID, slotPkt);
+      await new Promise(r => setTimeout(r, 20));
+
+      for (let i = 0; i < 8; i++) {
+        const b = state.bands[i];
+        const gfReg = 0x26 + i * 2;
+        const qtReg = gfReg + 1;
+
+        let rawGain = Math.round(b.gain * 10);
+        if (rawGain < 0) rawGain += 0x10000;
+        const rawFreq = Math.round(b.freq);
+
+        const gfPkt = new Uint8Array([
+          gfReg, 0, 0, 0, CMD_WRITE, 0,
+          rawGain & 0xff, (rawGain >> 8) & 0xff,
+          rawFreq & 0xff, (rawFreq >> 8) & 0xff
+        ]);
+        await hidDevice.sendReport(REPORT_ID, gfPkt);
+        await new Promise(r => setTimeout(r, 10));
+
+        const rawQ = Math.round(b.q * 1000);
+        const typeCode = b.type === "LSQ" ? 3 : (b.type === "HSQ" ? 4 : 0);
+        const qtPkt = new Uint8Array([
+          qtReg, 0, 0, 0, CMD_WRITE, 0,
+          rawQ & 0xff, (rawQ >> 8) & 0xff,
+          typeCode, 0
+        ]);
+        await hidDevice.sendReport(REPORT_ID, qtPkt);
+        await new Promise(r => setTimeout(r, 10));
+      }
+
+      const preVal = Math.round(state.pregain) & 0xff;
+      const prePkt = new Uint8Array([0x66, 0, 0, 0, CMD_WRITE, 0, preVal, 0, 0, 0]);
+      await hidDevice.sendReport(REPORT_ID, prePkt);
+      await new Promise(r => setTimeout(r, 20));
+
+      const commitPkt = new Uint8Array([0, 0, 0, 0, CMD_COMMIT, 0, 0, 0, 0, 0]);
+      await hidDevice.sendReport(REPORT_ID, commitPkt);
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    // RBJ Audio EQ Cookbook biquad frequency response calculation
+    function biquadResponse(f, fs, type, f0, gainDb, q) {
+      const w0 = 2 * Math.PI * f0 / fs;
+      const alpha = Math.sin(w0) / (2 * q);
+      const A = Math.pow(10, gainDb / 40);
+      const cosw0 = Math.cos(w0);
+
+      let b0, b1, b2, a0, a1, a2;
+      if (type === "PK") {
+        b0 = 1 + alpha * A;
+        b1 = -2 * cosw0;
+        b2 = 1 - alpha * A;
+        a0 = 1 + alpha / A;
+        a1 = -2 * cosw0;
+        a2 = 1 - alpha / A;
+      } else if (type === "LSQ") {
+        const sqrtA = Math.sqrt(A);
+        b0 = A * ((A + 1) - (A - 1) * cosw0 + 2 * sqrtA * alpha);
+        b1 = 2 * A * ((A - 1) - (A + 1) * cosw0);
+        b2 = A * ((A + 1) - (A - 1) * cosw0 - 2 * sqrtA * alpha);
+        a0 = (A + 1) + (A - 1) * cosw0 + 2 * sqrtA * alpha;
+        a1 = -2 * ((A - 1) + (A + 1) * cosw0);
+        a2 = (A + 1) + (A - 1) * cosw0 - 2 * sqrtA * alpha;
+      } else if (type === "HSQ") {
+        const sqrtA = Math.sqrt(A);
+        b0 = A * ((A + 1) + (A - 1) * cosw0 + 2 * sqrtA * alpha);
+        b1 = -2 * A * ((A - 1) + (A + 1) * cosw0);
+        b2 = A * ((A + 1) - (A - 1) * cosw0 - 2 * sqrtA * alpha);
+        a0 = (A + 1) - (A - 1) * cosw0 + 2 * sqrtA * alpha;
+        a1 = 2 * ((A - 1) - (A + 1) * cosw0);
+        a2 = (A + 1) - (A - 1) * cosw0 - 2 * sqrtA * alpha;
+      } else {
+        return 0.0;
+      }
+
+      const phi = Math.PI * f / fs;
+      const sinphi = Math.sin(phi);
+      const cosphi = Math.cos(phi);
+      const sin2phi = Math.sin(2 * phi);
+      const cos2phi = Math.cos(2 * phi);
+
+      const numReal = (b0 / a0) + (b1 / a0) * cosphi + (b2 / a0) * cos2phi;
+      const numImag = -(b1 / a0) * sinphi - (b2 / a0) * sin2phi;
+      const denReal = 1 + (a1 / a0) * cosphi + (a2 / a0) * cos2phi;
+      const denImag = -(a1 / a0) * sinphi - (a2 / a0) * sin2phi;
+
+      const numMagSq = numReal * numReal + numImag * numImag;
+      const denMagSq = denReal * denReal + denImag * denImag;
+
+      return 10 * Math.log10(Math.max(1e-12, numMagSq / denMagSq));
+    }
+
+    // Logarithmic grid mapping and response curve renderer
+    const minF = 20, maxF = 20000;
+    const minDb = -12, maxDb = 12;
+
+    let draggingBandIdx = null;
+    let hoveredBandIdx = null;
+
+    function getPlotBounds(w, h) {
+      return {
+        x: 42,
+        y: 22,
+        w: w - 62,
+        h: h - 54
+      };
+    }
+
+    function xForF(f, bounds) {
+      return bounds.x + (Math.log10(f / minF) / Math.log10(maxF / minF)) * bounds.w;
+    }
+
+    function fForX(x, bounds) {
+      const ratio = Math.max(0, Math.min(1, (x - bounds.x) / bounds.w));
+      return minF * Math.pow(maxF / minF, ratio);
+    }
+
+    function yForDb(db, bounds) {
+      return bounds.y + bounds.h - ((db - minDb) / (maxDb - minDb)) * bounds.h;
+    }
+
+    function dbForY(y, bounds) {
+      const ratio = Math.max(0, Math.min(1, (bounds.y + bounds.h - y) / bounds.h));
+      return minDb + ratio * (maxDb - minDb);
+    }
+
+    function drawSquiglinkGraph() {
+      const canvas = document.getElementById("eqCanvas");
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const bounds = getPlotBounds(w, h);
+
+      // 1. Central Rosette Watermark (Squiglink style)
+      ctx.save();
+      ctx.translate(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.02)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 70, 0, Math.PI * 2);
+      ctx.fill();
+      for (let i = 0; i < 6; i++) {
+        ctx.rotate(Math.PI / 3);
+        ctx.beginPath();
+        ctx.ellipse(32, 0, 26, 15, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 2. Y-Axis Unit
+      ctx.fillStyle = "#555555";
+      ctx.font = "600 10px monospace";
+      ctx.fillText("dB", bounds.x - 20, bounds.y - 8);
+
+      // 3. Horizontal dB Grid Lines
+      for (let db = -12; db <= 12; db += 3) {
+        const y = yForDb(db, bounds);
+        ctx.beginPath();
+        ctx.strokeStyle = db === 0 ? "#252525" : "#101010";
+        ctx.lineWidth = db === 0 ? 1.5 : 1;
+        ctx.moveTo(bounds.x, y);
+        ctx.lineTo(bounds.x + bounds.w, y);
+        ctx.stroke();
+
+        ctx.fillStyle = db === 0 ? "#888888" : "#444444";
+        ctx.font = "10px monospace";
+        ctx.textAlign = "right";
+        ctx.fillText(`${db > 0 ? '+' : ''}${db}`, bounds.x - 8, y + 3);
+      }
+      ctx.textAlign = "left";
+
+      // 4. Vertical Frequency Grid Lines
+      const allFreqs = [
+        20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 500, 600, 800,
+        1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000
+      ];
+      const majorDemarcations = [80, 300, 1000, 4000, 6000, 10000];
+
+      allFreqs.forEach(f => {
+        const x = xForF(f, bounds);
+        const isMajor = majorDemarcations.includes(f);
+
+        ctx.beginPath();
+        ctx.strokeStyle = isMajor ? "#262626" : "#101010";
+        ctx.lineWidth = isMajor ? 1.5 : 1;
+        ctx.moveTo(x, bounds.y);
+        ctx.lineTo(x, bounds.y + bounds.h);
+        ctx.stroke();
+
+        // Frequency Label on Bottom Axis
+        ctx.fillStyle = isMajor ? "#999999" : "#444444";
+        ctx.font = isMajor ? "600 9px monospace" : "9px monospace";
+        let lbl = f >= 1000 ? `${f/1000}k` : `${f}`;
+        if (f === 20) lbl = "20Hz";
+        if (f === 20000) lbl = "20kHz";
+        ctx.textAlign = "center";
+        ctx.fillText(lbl, x, bounds.y + bounds.h + 13);
+      });
+
+      // 5. Region demarcations & Names (Sub bass, Mid bass, etc.)
+      const regions = [
+        { name: "Sub bass", min: 20, max: 80 },
+        { name: "Mid bass", min: 80, max: 300 },
+        { name: "Lower midrange", min: 300, max: 1000 },
+        { name: "Upper midrange", min: 1000, max: 4000 },
+        { name: "Presence region", min: 4000, max: 6000 },
+        { name: "Mid treble", min: 6000, max: 10000 },
+        { name: "Air", min: 10000, max: 20000 }
+      ];
+
+      ctx.fillStyle = "#555555";
+      ctx.font = "8.5px sans-serif";
+      regions.forEach(r => {
+        const x1 = xForF(r.min, bounds);
+        const x2 = xForF(r.max, bounds);
+        const cx = (x1 + x2) / 2;
+        ctx.textAlign = "center";
+        ctx.fillText(r.name, cx, bounds.y + bounds.h + 26);
+      });
+
+      // 6. Left Squiglink Range Slider Icon Representation
+      const handleY = bounds.y + bounds.h * 0.45;
+      ctx.fillStyle = "#1c1c1c";
+      ctx.strokeStyle = "#333333";
+      ctx.beginPath();
+      ctx.roundRect(bounds.x - 36, handleY - 24, 14, 48, [6]);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = "#666666";
+      ctx.lineWidth = 1.2;
+      for (let i = -6; i <= 6; i += 5) {
+        ctx.beginPath();
+        ctx.moveTo(bounds.x - 32, handleY + i);
+        ctx.lineTo(bounds.x - 26, handleY + i);
+        ctx.stroke();
+      }
+
+      // 7. Total Frequency Response Curve (Glowing White / Cyan line)
+      const fs = 48000;
+      ctx.beginPath();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = "rgba(255, 255, 255, 0.4)";
+      ctx.shadowBlur = 4;
+
+      for (let px = bounds.x; px <= bounds.x + bounds.w; px += 2) {
+        const freq = fForX(px, bounds);
+        let total = state.pregain;
+        for (const b of state.bands) {
+          total += biquadResponse(freq, fs, b.type, b.freq, b.gain, b.q);
+        }
+        const y = yForDb(total, bounds);
+        if (px === bounds.x) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 9. Interactive Draggable Band Nodes
+      state.bands.forEach((b, i) => {
+        let totalAtF = state.pregain;
+        for (const ob of state.bands) {
+          totalAtF += biquadResponse(b.freq, fs, ob.type, ob.freq, ob.gain, ob.q);
+        }
+        const dotX = xForF(b.freq, bounds);
+        const dotY = yForDb(totalAtF, bounds);
+
+        const isHovered = (hoveredBandIdx === i);
+        const isDragging = (draggingBandIdx === i);
+
+        // Outer Ring
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, isDragging ? 8 : (isHovered ? 7 : 5), 0, Math.PI * 2);
+        ctx.fillStyle = isDragging ? "#0284c7" : (isHovered ? "#38bdf8" : "#ffffff");
+        ctx.fill();
+
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Node Label
+        ctx.fillStyle = isDragging || isHovered ? "#38bdf8" : "#999999";
+        ctx.font = "600 9px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(`${i + 1}`, dotX, dotY - 9);
+
+        // Tooltip when hovering or dragging
+        if (isHovered || isDragging) {
+          const tipText = `Band ${i+1}: ${Math.round(b.freq)}Hz | ${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)}dB | Q ${b.q.toFixed(2)}`;
+          ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+          ctx.strokeStyle = "#38bdf8";
+          ctx.lineWidth = 1;
+          const tipW = ctx.measureText(tipText).width + 16;
+          const tipX = Math.max(bounds.x + 10, Math.min(bounds.x + bounds.w - tipW - 10, dotX - tipW / 2));
+          const tipY = Math.max(bounds.y + 12, dotY - 26);
+          ctx.fillRect(tipX, tipY, tipW, 18);
+          ctx.strokeRect(tipX, tipY, tipW, 18);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(tipText, tipX + tipW / 2, tipY + 12);
+        }
+      });
+    }
+
+    // Interactive canvas drag and scroll controls
+    const canvas = document.getElementById("eqCanvas");
+
+    function getMousePos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function findNodeAt(mx, my) {
+      const rect = canvas.getBoundingClientRect();
+      const bounds = getPlotBounds(rect.width, rect.height);
+      const fs = 48000;
+
+      for (let i = 0; i < state.bands.length; i++) {
+        const b = state.bands[i];
+        let total = state.pregain;
+        for (const ob of state.bands) {
+          total += biquadResponse(b.freq, fs, ob.type, ob.freq, ob.gain, ob.q);
+        }
+        const nx = xForF(b.freq, bounds);
+        const ny = yForDb(total, bounds);
+        const dist = Math.hypot(mx - nx, my - ny);
+        if (dist <= 14) return i;
+      }
+      return null;
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      const pos = getMousePos(e);
+      const hit = findNodeAt(pos.x, pos.y);
+      if (hit !== null) {
+        draggingBandIdx = hit;
+        canvas.style.cursor = "grabbing";
+        highlightChannelStrip(hit);
+        drawSquiglinkGraph();
+      }
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const pos = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+
+      if (draggingBandIdx !== null) {
+        const bounds = getPlotBounds(rect.width, rect.height);
+        const newFreq = Math.round(fForX(pos.x, bounds));
+        const rawDb = dbForY(pos.y, bounds);
+        const newGain = Math.round((rawDb - state.pregain) * 2) / 2; // snap to 0.5dB
+
+        state.bands[draggingBandIdx].freq = Math.max(20, Math.min(18000, newFreq));
+        state.bands[draggingBandIdx].gain = Math.max(-10, Math.min(10, newGain));
+
+        syncBandToInputs(draggingBandIdx);
+        drawSquiglinkGraph();
+      } else {
+        const hit = findNodeAt(pos.x, pos.y);
+        if (hit !== hoveredBandIdx) {
+          hoveredBandIdx = hit;
+          canvas.style.cursor = hit !== null ? "grab" : "crosshair";
+          drawSquiglinkGraph();
+        }
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (draggingBandIdx !== null) {
+        draggingBandIdx = null;
+        canvas.style.cursor = "crosshair";
+        removeChannelHighlights();
+        drawSquiglinkGraph();
+      }
+    });
+
+    canvas.addEventListener("wheel", (e) => {
+      const pos = getMousePos(e);
+      const hit = findNodeAt(pos.x, pos.y);
+      if (hit !== null) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.1 : -0.1;
+        const newQ = Math.max(0.2, Math.min(5.0, Math.round((state.bands[hit].q + delta) * 10) / 10));
+        state.bands[hit].q = newQ;
+        syncBandToInputs(hit);
+        drawSquiglinkGraph();
+      }
+    }, { passive: false });
+
+    // Double click node to reset gain to 0
+    canvas.addEventListener("dblclick", (e) => {
+      const pos = getMousePos(e);
+      const hit = findNodeAt(pos.x, pos.y);
+      if (hit !== null) {
+        state.bands[hit].gain = 0.0;
+        syncBandToInputs(hit);
+        drawSquiglinkGraph();
+      }
+    });
+
+    function highlightChannelStrip(idx) {
+      document.querySelectorAll(".channel-strip").forEach((s, i) => {
+        if (i === idx) s.classList.add("active-drag");
+        else s.classList.remove("active-drag");
+      });
+    }
+
+    function removeChannelHighlights() {
+      document.querySelectorAll(".channel-strip").forEach(s => s.classList.remove("active-drag"));
+    }
+
+    function syncBandToInputs(idx) {
+      const b = state.bands[idx];
+      const freqSlider = document.querySelector(`.slider-freq[data-band="${idx}"]`);
+      const gainSlider = document.querySelector(`.slider-gain[data-band="${idx}"]`);
+      const qSlider = document.querySelector(`.slider-q[data-band="${idx}"]`);
+
+      if (freqSlider) freqSlider.value = b.freq;
+      if (gainSlider) gainSlider.value = b.gain;
+      if (qSlider) qSlider.value = b.q;
+
+      const fV = document.getElementById(`freqVal-${idx}`);
+      const gV = document.getElementById(`gainVal-${idx}`);
+      const qV = document.getElementById(`qVal-${idx}`);
+
+      if (fV) fV.textContent = `${b.freq} Hz`;
+      if (gV) gV.textContent = `${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)} dB`;
+      if (qV) qV.textContent = b.q.toFixed(2);
+    }
+
+    // Generate channel strip controls for all 8 bands
+    function renderChannels() {
+      const container = document.getElementById("channelsContainer");
+      container.innerHTML = "";
+
+      state.bands.forEach((b, i) => {
+        const strip = document.createElement("div");
+        strip.className = "channel-strip";
+        strip.innerHTML = `
+          <div class="channel-top">
+            <span class="band-label">Band ${i + 1}</span>
+            <select class="type-select" data-band="${i}">
+              <option value="PK" ${b.type === "PK" ? "selected" : ""}>Peak</option>
+              <option value="LSQ" ${b.type === "LSQ" ? "selected" : ""}>LowShelf</option>
+              <option value="HSQ" ${b.type === "HSQ" ? "selected" : ""}>HighShelf</option>
+            </select>
+          </div>
+
+          <div class="knob-row">
+            <div class="knob-label-row">
+              <span>Freq</span>
+              <span class="knob-val" id="freqVal-${i}">${b.freq} Hz</span>
+            </div>
+            <input type="range" class="slider-freq" data-band="${i}" min="20" max="18000" step="10" value="${b.freq}">
+          </div>
+
+          <div class="knob-row">
+            <div class="knob-label-row">
+              <span>Gain</span>
+              <span class="knob-val" id="gainVal-${i}">${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)} dB</span>
+            </div>
+            <input type="range" class="slider-gain" data-band="${i}" min="-10" max="10" step="0.5" value="${b.gain}">
+          </div>
+
+          <div class="knob-row">
+            <div class="knob-label-row">
+              <span>Q Factor</span>
+              <span class="knob-val" id="qVal-${i}">${b.q.toFixed(2)}</span>
+            </div>
+            <input type="range" class="slider-q" data-band="${i}" min="0.2" max="5.0" step="0.1" value="${b.q}">
+          </div>
+        `;
+        container.appendChild(strip);
+      });
+
+      document.querySelectorAll(".slider-freq").forEach(el => {
+        el.addEventListener("input", (e) => {
+          const idx = e.target.dataset.band;
+          state.bands[idx].freq = parseFloat(e.target.value);
+          document.getElementById(`freqVal-${idx}`).textContent = `${state.bands[idx].freq} Hz`;
+          drawSquiglinkGraph();
+        });
+      });
+      document.querySelectorAll(".slider-gain").forEach(el => {
+        el.addEventListener("input", (e) => {
+          const idx = e.target.dataset.band;
+          state.bands[idx].gain = parseFloat(e.target.value);
+          document.getElementById(`gainVal-${idx}`).textContent = `${state.bands[idx].gain > 0 ? '+' : ''}${state.bands[idx].gain.toFixed(1)} dB`;
+          drawSquiglinkGraph();
+        });
+      });
+      document.querySelectorAll(".slider-q").forEach(el => {
+        el.addEventListener("input", (e) => {
+          const idx = e.target.dataset.band;
+          state.bands[idx].q = parseFloat(e.target.value);
+          document.getElementById(`qVal-${idx}`).textContent = state.bands[idx].q.toFixed(2);
+          drawSquiglinkGraph();
+        });
+      });
+      document.querySelectorAll(".type-select").forEach(el => {
+        el.addEventListener("change", (e) => {
+          const idx = e.target.dataset.band;
+          state.bands[idx].type = e.target.value;
+          drawSquiglinkGraph();
+        });
+      });
+    }
+
+    function renderUI() {
+      document.getElementById("pregainSlider").value = state.pregain;
+      document.getElementById("pregainVal").textContent = `${state.pregain > 0 ? '+' : ''}${state.pregain.toFixed(1)} dB`;
+      renderChannels();
+      drawSquiglinkGraph();
+    }
+
+    document.getElementById("pregainSlider").addEventListener("input", (e) => {
+      state.pregain = parseFloat(e.target.value);
+      document.getElementById("pregainVal").textContent = `${state.pregain > 0 ? '+' : ''}${state.pregain.toFixed(1)} dB`;
+      drawSquiglinkGraph();
+    });
+
+    // Connection status and WebHID/backend handshakes
+    function setConnectedUI(modeStr) {
+      document.getElementById("sidebarDot").classList.add("connected");
+      document.getElementById("sidebarSub").textContent = "Active / Online";
+      document.getElementById("topStatusDot").classList.add("connected");
+      document.getElementById("topStatusText").textContent = `Connected (${modeStr})`;
+      document.getElementById("infoConnVal").textContent = "Connected";
+      document.getElementById("infoConnDesc").textContent = `${modeStr} Interface`;
+      document.getElementById("toastMsg").textContent = `Active: ${modeStr} connection established.`;
+    }
+
+    async function tryLocalBackendAutoConnect() {
+      try {
+        const res = await fetch("/api/status");
+        const json = await res.json();
+        if (json.ok) {
+          state.pregain = json.data.pregain;
+          state.bands = json.data.bands.map(b => ({
+            freq: b.freq, gain: b.gain, q: b.q, type: b.type
+          }));
+          useBackend = true;
+          setConnectedUI("Backend");
+          renderUI();
+          return true;
+        }
+      } catch (err) {}
+      return false;
+    }
+
+    document.getElementById("connectHidBtn").addEventListener("click", async () => {
+      if (!navigator.hid) {
+        const ok = await tryLocalBackendAutoConnect();
+        if (!ok) alert("WebHID is not supported in this browser. Please use Helium or Chrome.");
+        return;
+      }
+
+      try {
+        const devices = await navigator.hid.requestDevice({
+          filters: [{ vendorId: 0x31B2, productId: 0x1112 }]
+        });
+        if (devices.length === 0) return;
+        hidDevice = devices[0];
+        if (!hidDevice.opened) await hidDevice.open();
+
+        setupReportListener(hidDevice);
+        setConnectedUI("WebHID");
+        await webhidReadAll();
+      } catch (err) {
+        console.error(err);
+        const ok = await tryLocalBackendAutoConnect();
+        if (!ok) alert(`Connection error: ${err.message}`);
+      }
+    });
+
+    document.getElementById("deviceCard").addEventListener("click", () => {
+      document.getElementById("connectHidBtn").click();
+    });
+
+    // Hardware flash commit handler
+    document.getElementById("burnFlashBtn").addEventListener("click", async () => {
+      document.getElementById("toastMsg").textContent = "Writing to hardware EEPROM...";
+      try {
+        if (hidDevice && hidDevice.opened) {
+          await webhidWriteAll();
+          document.getElementById("toastMsg").textContent = "[OK] Settings burned to chip flash.";
+        } else if (useBackend) {
+          const res = await fetch("/api/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(state)
+          });
+          const json = await res.json();
+          if (!json.ok) throw new Error(json.error);
+          document.getElementById("toastMsg").textContent = "[OK] Hardware flash updated via local backend.";
+        } else {
+          alert("Connect to Bunny DSP before burning to flash.");
+        }
+      } catch (err) {
+        document.getElementById("toastMsg").textContent = `Save error: ${err.message}`;
+        alert(`Failed to save: ${err.message}`);
+      }
+    });
+
+    // Preset selection buttons
+    document.querySelectorAll(".pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        const key = btn.dataset.preset;
+        if (PRESETS[key]) {
+          state.pregain = PRESETS[key].pregain;
+          state.bands = JSON.parse(JSON.stringify(PRESETS[key].bands));
+          renderUI();
+          document.getElementById("toastMsg").textContent = `Loaded target: ${btn.textContent}`;
+        }
+      });
+    });
+
+    document.getElementById("resetFlatBtn").addEventListener("click", () => {
+      const p = PRESETS.flat;
+      state.pregain = p.pregain;
+      state.bands = JSON.parse(JSON.stringify(p.bands));
+      renderUI();
+      document.getElementById("toastMsg").textContent = "Reset to flat 0 dB.";
+    });
+
+    const modal = document.getElementById("importModal");
+    document.getElementById("openImportModalBtn").addEventListener("click", () => modal.classList.add("open"));
+    document.getElementById("navImportBtn").addEventListener("click", () => modal.classList.add("open"));
+    document.getElementById("closeImportModalBtn").addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+
+    const creditsModal = document.getElementById("creditsModal");
+    document.getElementById("openCreditsModalBtn").addEventListener("click", () => creditsModal.classList.add("open"));
+    document.getElementById("closeCreditsModalBtn").addEventListener("click", () => creditsModal.classList.remove("open"));
+    creditsModal.addEventListener("click", (e) => {
+      if (e.target === creditsModal) creditsModal.classList.remove("open");
+    });
+
+    function copySnippet(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.style.color = "#38bdf8";
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.style.color = "";
+        }, 1500);
+      }).catch(() => {
+        prompt("Copy text:", text);
+      });
+    }
+
+    // Preset file ingestion (.json and AutoEQ .txt)
+    function parseAndApplyAutoEqText(text, sourceName) {
+      if (!text || !text.trim()) return false;
+      let pregain = 0.0;
+      const bands = [];
+
+      for (const line of text.split("\n")) {
+        const l = line.trim();
+        if (!l || l.startsWith("#")) continue;
+
+        const preM = l.match(/Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*dB/i);
+        if (preM) {
+          pregain = parseFloat(preM[1]);
+          continue;
+        }
+
+        const filtM = l.match(/Filter\s+\d+:\s*(?:ON\s+)?(PK|LSQ|HSQ|LSC|HSC|PEAK)?\s*(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+        if (filtM) {
+          let t = (filtM[1] || "PK").toUpperCase();
+          t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
+          bands.push({
+            freq: parseFloat(filtM[2]),
+            gain: parseFloat(filtM[3]),
+            q: filtM[4] ? parseFloat(filtM[4]) : 1.41,
+            type: t
+          });
+        }
+      }
+
+      if (bands.length > 0) {
+        state.pregain = pregain;
+        for (let i = 0; i < 8; i++) {
+          state.bands[i] = i < bands.length ? bands[i] : { freq: 1000, gain: 0, q: 1.0, type: "PK" };
+        }
+        renderUI();
+        document.getElementById("toastMsg").textContent = `[OK] Imported ${Math.min(8, bands.length)} filter bands from ${sourceName || "text"}.`;
+        return true;
+      }
+      return false;
+    }
+
+    function handlePresetFile(file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        try {
+          if (file.name.endsWith(".json") || text.trim().startsWith("{")) {
+            const data = JSON.parse(text);
+            if (data.pregain !== undefined) state.pregain = data.pregain;
+            if (Array.isArray(data.bands)) {
+              for (let i = 0; i < 8; i++) {
+                if (i < data.bands.length) {
+                  state.bands[i] = {
+                    freq: data.bands[i].freq || 1000,
+                    gain: data.bands[i].gain !== undefined ? data.bands[i].gain : 0.0,
+                    q: data.bands[i].q || 1.0,
+                    type: data.bands[i].type || "PK"
+                  };
+                } else {
+                  state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
+                }
+              }
+            }
+            renderUI();
+            document.getElementById("toastMsg").textContent = `[OK] Loaded preset from ${file.name}`;
+            return;
+          }
+        } catch (err) {}
+
+        const ok = parseAndApplyAutoEqText(text, file.name);
+        if (!ok) {
+          alert("Could not parse any filters from file: " + file.name);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    const presetFileInput = document.getElementById("presetFileInput");
+    document.getElementById("loadPresetFileBtn").addEventListener("click", () => presetFileInput.click());
+    const modalChooseFileBtn = document.getElementById("modalChooseFileBtn");
+    if (modalChooseFileBtn) modalChooseFileBtn.addEventListener("click", () => presetFileInput.click());
+
+    presetFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) handlePresetFile(file);
+      presetFileInput.value = "";
+    });
+
+    document.getElementById("savePresetFileBtn").addEventListener("click", () => {
+      const data = {
+        name: "Custom 8-Band Profile",
+        pregain: state.pregain,
+        bands: state.bands
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "tanchjim_bunny_preset.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById("toastMsg").textContent = "[OK] Saved preset to tanchjim_bunny_preset.json";
+    });
+
+    const exportTxtBtn = document.getElementById("exportTxtBtn");
+    if (exportTxtBtn) {
+      exportTxtBtn.addEventListener("click", () => {
+        let txt = `Preamp: ${state.pregain.toFixed(1)} dB\n`;
+        state.bands.forEach((b, i) => {
+          txt += `Filter ${i + 1}: ON ${b.type} Fc ${b.freq} Hz Gain ${b.gain.toFixed(1)} dB Q ${b.q.toFixed(2)}\n`;
+        });
+        const blob = new Blob([txt], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ParametricEQ.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Drag & drop support for preset files
+    window.addEventListener("dragover", (e) => { e.preventDefault(); });
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handlePresetFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    // Microphone input gain slider
+    const micSlider = document.getElementById("micGainSlider");
+    const micVal = document.getElementById("micGainVal");
+
+    async function loadMicGain() {
+      try {
+        const res = await fetch("/api/mic-gain");
+        const json = await res.json();
+        if (json.ok && json.volume !== undefined) {
+          const pct = Math.round(json.volume * 100);
+          micSlider.value = pct;
+          micVal.textContent = `${pct}%`;
+        }
+      } catch (e) {}
+    }
+
+    let micDebounce = null;
+    micSlider.addEventListener("input", (e) => {
+      const pct = parseInt(e.target.value, 10);
+      micVal.textContent = `${pct}%`;
+      clearTimeout(micDebounce);
+      micDebounce = setTimeout(async () => {
+        try {
+          await fetch("/api/mic-gain", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ volume: pct / 100.0 })
+          });
+        } catch (e) {}
+      }, 80);
+    });
+
+    document.getElementById("applyImportBtn").addEventListener("click", () => {
+      const text = document.getElementById("importText").value;
+      if (!text.trim()) return;
+      const ok = parseAndApplyAutoEqText(text, "Pasted Text");
+      if (ok) {
+        modal.classList.remove("open");
+      } else {
+        alert("Could not parse any filters from text.");
+      }
+    });
+
+    document.getElementById("navExportBtn").addEventListener("click", () => {
+      let txt = `Preamp: ${state.pregain.toFixed(1)} dB\n`;
+      state.bands.forEach((b, i) => {
+        txt += `Filter ${i + 1}: ON ${b.type} Fc ${b.freq} Hz Gain ${b.gain.toFixed(1)} dB Q ${b.q.toFixed(2)}\n`;
+      });
+      navigator.clipboard.writeText(txt).then(() => {
+        alert("Parametric EQ profile copied to clipboard:\n\n" + txt);
+      }).catch(() => {
+        prompt("Copy profile:", txt);
+      });
+    });
+
+    window.addEventListener("resize", drawSquiglinkGraph);
+
+    // Initial render
+    renderUI();
+    loadMicGain();
+    tryLocalBackendAutoConnect();
+  </script>
+</body>
+</html>

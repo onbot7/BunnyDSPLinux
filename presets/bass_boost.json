@@ -1,0 +1,15 @@
+{
+  "name": "Bass Boost (+4.5dB Sub-Bass)",
+  "description": "Deep, rumbling low-end response with clean lower mids and headroom protection",
+  "pregain": -4.0,
+  "bands": [
+    {"band": 0, "freq": 32, "gain": 3.0, "q": 1.0, "type": "PK"},
+    {"band": 1, "freq": 60, "gain": 4.5, "q": 0.7, "type": "LSQ"},
+    {"band": 2, "freq": 125, "gain": 2.0, "q": 1.0, "type": "PK"},
+    {"band": 3, "freq": 220, "gain": 1.0, "q": 1.0, "type": "PK"},
+    {"band": 4, "freq": 1000, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 5, "freq": 3000, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 6, "freq": 6000, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 7, "freq": 8000, "gain": 0.0, "q": 1.0, "type": "PK"}
+  ]
+}

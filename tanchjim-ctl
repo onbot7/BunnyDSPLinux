@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+PRG="$0"
+while [ -h "$PRG" ]; do
+    ls=$(ls -ld "$PRG")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+        PRG="$link"
+    else
+        PRG="$(dirname "$PRG")/$link"
+    fi
+done
+PROJECT_DIR="$(cd "$(dirname "$PRG")" && pwd)"
+
+exec python3 "$PROJECT_DIR/tanchjim_bunny.py" "$@"

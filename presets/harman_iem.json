@@ -1,0 +1,15 @@
+{
+  "name": "Harman Target IEM",
+  "description": "Approximation of Harman 2019v2 target: energetic sub-bass shelf and clear ear-gain",
+  "pregain": -3.5,
+  "bands": [
+    {"band": 0, "freq": 45, "gain": 4.5, "q": 0.7, "type": "LSQ"},
+    {"band": 1, "freq": 180, "gain": -1.5, "q": 1.0, "type": "PK"},
+    {"band": 2, "freq": 500, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 3, "freq": 1200, "gain": 1.2, "q": 1.8, "type": "PK"},
+    {"band": 4, "freq": 3500, "gain": -1.8, "q": 2.2, "type": "PK"},
+    {"band": 5, "freq": 6000, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 6, "freq": 8500, "gain": 2.0, "q": 0.8, "type": "HSQ"},
+    {"band": 7, "freq": 12000, "gain": 0.0, "q": 1.0, "type": "PK"}
+  ]
+}

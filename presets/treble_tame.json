@@ -1,0 +1,15 @@
+{
+  "name": "Treble Tame / Anti-Sibilance",
+  "description": "Smooths out 6kHz-8kHz sibilance peaks for relaxed, non-fatiguing listening",
+  "pregain": 0.0,
+  "bands": [
+    {"band": 0, "freq": 60, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 1, "freq": 100, "gain": 1.0, "q": 1.0, "type": "PK"},
+    {"band": 2, "freq": 500, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 3, "freq": 1000, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 4, "freq": 2500, "gain": 0.0, "q": 1.0, "type": "PK"},
+    {"band": 5, "freq": 4500, "gain": -1.5, "q": 2.0, "type": "PK"},
+    {"band": 6, "freq": 6500, "gain": -3.5, "q": 3.0, "type": "PK"},
+    {"band": 7, "freq": 10000, "gain": -2.0, "q": 1.5, "type": "HSQ"}
+  ]
+}
