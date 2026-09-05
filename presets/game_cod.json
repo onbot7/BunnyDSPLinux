@@ -1,0 +1,63 @@
+{
+  "name": "Game: Call of Duty",
+  "description": "Tanchjim official tactical tuning for Call of Duty: clear gunshots and footstep audio separation",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -4.0,
+      "q": 0.3,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -6.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1400,
+      "gain": -3.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4700,
+      "gain": -5.5,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": 0.0,
+      "q": 1.1,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

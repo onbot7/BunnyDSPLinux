@@ -1,0 +1,63 @@
+{
+  "name": "Metal & Hard Rock (Metal Tenchijm)",
+  "description": "Punchy 60Hz kick drums, reduced mud, and fast aggressive midrange for heavy metal & rock",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 60,
+      "gain": 3.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 250,
+      "gain": -2.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 800,
+      "gain": -1.5,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4000,
+      "gain": 2.5,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": 2.0,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Poisonous Female Vocals (\u5973\u58f0\u6bd2)",
+  "description": "Dedicated tuning for anime ACG, J-Pop & Chinese female lead vocals: intimate & sweet",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 125,
+      "gain": -2.0,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 500,
+      "gain": -1.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4000,
+      "gain": 2.0,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 8000,
+      "gain": -1.0,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

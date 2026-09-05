@@ -1,0 +1,63 @@
+{
+  "name": "Flagship Tier Separation",
+  "description": "Tuned after 00 flagship IEM: clinical bass/vocal separation and expansive imaging",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": 5.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -2.5,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1200,
+      "gain": -1.5,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 3200,
+      "gain": 2.5,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 8000,
+      "gain": -2.0,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

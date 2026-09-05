@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim ONE Target",
+  "description": "Official factory sound curve of Tanchjim ONE DSP",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 50,
+      "gain": -2.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -4.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1400,
+      "gain": -1.5,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 6000,
+      "gain": -5.0,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 8300,
+      "gain": -2.0,
+      "q": 5.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Official Pop Sound (Harman 2016)",
+  "description": "Harman 2016 target curve tuning with enhanced low-frequency energy",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -0.7,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -6.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 800,
+      "gain": -1.2,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 1800,
+      "gain": -3.8,
+      "q": 0.9,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 7500,
+      "gain": -6.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

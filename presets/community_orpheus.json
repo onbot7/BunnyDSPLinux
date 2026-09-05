@@ -1,0 +1,63 @@
+{
+  "name": "Bunny Sennheiser HE-1 Orpheus Target",
+  "description": "Tuned after Sennheiser HE-1 Orpheus flagship: expansive soundstage and lifelike timbre (Top #1 Community EQ)",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -6.9,
+      "q": 0.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 600,
+      "gain": 2.4,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1800,
+      "gain": -3.1,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 3200,
+      "gain": 6.5,
+      "q": 4.1,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 5800,
+      "gain": 4.2,
+      "q": 1.7,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

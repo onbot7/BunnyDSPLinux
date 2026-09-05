@@ -1,0 +1,63 @@
+{
+  "name": "Official Balanced Sound (Harman 2013)",
+  "description": "Harman 2013 target curve tuning for balanced three-frequency distribution",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -6.5,
+      "q": 0.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -5.7,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 800,
+      "gain": -0.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 1600,
+      "gain": -4.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 7500,
+      "gain": -5.5,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

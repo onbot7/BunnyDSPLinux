@@ -1,0 +1,63 @@
+{
+  "name": "Universal All-Rounder (\u5168\u66f2\u98ce\u6742\u98df)",
+  "description": "Slight sub-bass boost, de-muddies lower mids, lifts vocal clarity & harmonics for ACG/Pop/EDM",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": 1.0,
+      "q": 0.3,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": 0.0,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 800,
+      "gain": -1.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 1700,
+      "gain": 4.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 7500,
+      "gain": 3.5,
+      "q": 0.9,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

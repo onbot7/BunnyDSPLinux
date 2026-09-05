@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim OLA (Natural)",
+  "description": "Official natural flat response tuning for Tanchjim OLA",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -4.0,
+      "q": 0.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -3.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 900,
+      "gain": -1.0,
+      "q": 1.8,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4000,
+      "gain": -2.9,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 7000,
+      "gain": -3.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

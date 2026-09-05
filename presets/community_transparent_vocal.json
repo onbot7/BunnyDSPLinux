@@ -1,0 +1,63 @@
+{
+  "name": "Silky Transparent Vocals (\u901a\u900f\u987a\u6ed1)",
+  "description": "Airy upper extension, clean mid-bass and lifted vocal intimacy: crystal clear presentation",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 90,
+      "gain": 1.5,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 400,
+      "gain": 1.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 2000,
+      "gain": 2.4,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 6200,
+      "gain": 3.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 1.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

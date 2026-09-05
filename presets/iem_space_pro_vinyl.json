@@ -1,0 +1,63 @@
+{
+  "name": "SPACE PRO (Vinyl Record Mode)",
+  "description": "Official Tanchjim SPACE PRO Vinyl turntable emulation: rich bass, lush mid-highs",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 40,
+      "gain": 4.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 250,
+      "gain": 3.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 4000,
+      "gain": 1.0,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 12000,
+      "gain": 3.0,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 20,
+      "gain": 0.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

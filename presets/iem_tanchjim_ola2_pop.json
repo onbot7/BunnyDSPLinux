@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim OLA II (Pop)",
+  "description": "Official pop profile of Tanchjim OLA II: rhythmic lower mids and engaging forward vocals",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 27,
+      "gain": -1.0,
+      "q": 0.1,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 141,
+      "gain": -3.8,
+      "q": 0.1,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 600,
+      "gain": 4.1,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 1754,
+      "gain": -2.3,
+      "q": 1.7,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 3000,
+      "gain": 1.5,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 6295,
+      "gain": 2.0,
+      "q": 1.6,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

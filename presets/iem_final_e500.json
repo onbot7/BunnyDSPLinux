@@ -1,0 +1,63 @@
+{
+  "name": "Final Audio E500 (ASMR King)",
+  "description": "Emulation of Final Audio E500 ASMR king: specialized spatial binaural tuning",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 224,
+      "gain": 4.3,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 415,
+      "gain": 1.1,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 2477,
+      "gain": -3.3,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4069,
+      "gain": -1.2,
+      "q": 3.1,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": -2.2,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

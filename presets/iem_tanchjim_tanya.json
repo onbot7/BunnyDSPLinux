@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim TANYA Target",
+  "description": "Official factory sound curve of Tanchjim TANYA DSP: warm bullet-style acoustic tuning",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 110,
+      "gain": -6.9,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 1410,
+      "gain": 2.4,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1540,
+      "gain": -6.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 3200,
+      "gain": -2.5,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 650,
+      "gain": -0.8,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

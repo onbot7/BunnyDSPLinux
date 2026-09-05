@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim MINO (Harman 2019)",
+  "description": "Official factory sound curve of Tanchjim MINO TWS / DSP with Harman 2019 target",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 200,
+      "gain": -9.0,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 1400,
+      "gain": -3.5,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 3000,
+      "gain": -5.0,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 5500,
+      "gain": -6.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 8600,
+      "gain": -6.5,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

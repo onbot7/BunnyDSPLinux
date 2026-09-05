@@ -1,0 +1,63 @@
+{
+  "name": "Clear Soundstage (CLEAR STAGE)",
+  "description": "80Hz foundation, 3kHz instrument clarity, 6kHz de-sibilance and 12kHz airy brilliance",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 80,
+      "gain": 1.5,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": 1.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 3000,
+      "gain": 1.5,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 6000,
+      "gain": -2.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 1.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

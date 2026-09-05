@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim OLA II (Theater)",
+  "description": "Official cinematic theater profile of Tanchjim OLA II: expansive soundstage & bass impact",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 244,
+      "gain": -4.0,
+      "q": 1.6,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 601,
+      "gain": 3.0,
+      "q": 1.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1643,
+      "gain": -1.5,
+      "q": 1.3,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 2877,
+      "gain": 2.8,
+      "q": 3.8,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 4215,
+      "gain": 1.0,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 6139,
+      "gain": 4.9,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 9216,
+      "gain": 2.0,
+      "q": 2.9,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

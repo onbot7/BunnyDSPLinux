@@ -1,0 +1,63 @@
+{
+  "name": "Classic V-Shaped Energy",
+  "description": "Elevated sub-bass slam and sparkling treble with recessed mids: fun energetic sound",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 32,
+      "gain": 6.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 150,
+      "gain": 2.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1000,
+      "gain": -3.0,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 6000,
+      "gain": 3.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 2.5,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

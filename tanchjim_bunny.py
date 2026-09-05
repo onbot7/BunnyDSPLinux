@@ -269,6 +269,74 @@ def set_mic_gain(vol):
     return False
 
 
+def play_test_noise(duration=5.0, level_db=-22.0):
+    fs = 48000
+    n_samples = int(fs * max(0.5, min(60.0, float(duration))))
+    clamped_db = max(-60.0, min(-6.0, float(level_db)))
+    amplitude = int(32767 * (10 ** (clamped_db / 20)))
+    fade_len = int(fs * 0.05)
+
+    import tempfile, wave, math, random
+
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        tmp_path = tmp.name
+
+    try:
+        with wave.open(tmp_path, "w") as wf:
+            wf.setnchannels(2)
+            wf.setsampwidth(2)
+            wf.setframerate(fs)
+            frames = bytearray()
+            for i in range(n_samples):
+                fade = 1.0
+                if i < fade_len:
+                    fade = 0.5 * (1 - math.cos(math.pi * i / fade_len))
+                elif i > n_samples - fade_len:
+                    fade = 0.5 * (1 - math.cos(math.pi * (n_samples - i) / fade_len))
+                sample = int(random.uniform(-1.0, 1.0) * amplitude * fade)
+                frames.extend(struct.pack("<hh", sample, sample))
+            wf.writeframes(frames)
+
+        target_sink = None
+        if shutil.which("wpctl"):
+            try:
+                out = subprocess.check_output(['wpctl', 'status'], text=True, stderr=subprocess.DEVNULL)
+                in_sinks = False
+                for line in out.splitlines():
+                    if 'Sinks:' in line:
+                        in_sinks = True
+                        continue
+                    if in_sinks:
+                        if line.strip().startswith(('├─', '└─', 'Sources:', 'Filters:')):
+                            break
+                        if 'TANCHJIM BUNNY' in line.upper():
+                            m = re.search(r'(\d+)\.', line)
+                            if m:
+                                target_sink = m.group(1)
+                                break
+            except Exception:
+                pass
+
+        print(f"Playing {duration:.1f}s white noise test signal ({clamped_db:.1f} dBFS) to DSP...")
+        if shutil.which("pw-play"):
+            cmd = ["pw-play"]
+            if target_sink:
+                cmd.extend(["--target", str(target_sink)])
+            cmd.append(tmp_path)
+            subprocess.run(cmd, check=True)
+        elif shutil.which("paplay"):
+            subprocess.run(["paplay", tmp_path], check=True)
+        elif shutil.which("aplay"):
+            subprocess.run(["aplay", "-q", tmp_path], check=True)
+        else:
+            print(f"No audio player utility found. Generated WAV saved at: {tmp_path}")
+            return
+        print("[OK] Test signal playback complete.")
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
 class BunnyDSP:
     def __init__(self, dev_path=None):
         if not dev_path:
@@ -471,6 +539,39 @@ class BunnyDSP:
         pregain = float(profile.get("pregain", 0.0))
         self.write_pregain(pregain)
         self.commit()
+
+    def dump_all_registers(self):
+        raw_bytes = bytearray()
+        regs = {}
+        for r in range(256):
+            resp = self.read_register(r)
+            chunk = resp[6:10]
+            raw_bytes.extend(chunk)
+            regs[f"0x{r:02x}"] = [f"0x{b:02x}" for b in chunk]
+
+        def get_str(start_reg, count):
+            b = bytearray()
+            for r in range(start_reg, start_reg + count):
+                hex_str = "".join(x.replace("0x", "") for x in regs[f"0x{r:02x}"])
+                b.extend(bytes.fromhex(hex_str))
+            return b.split(b"\x00")[0].decode("utf-8", errors="replace").strip()
+
+        meta = {
+            "device": "Tanchjim Bunny DSP",
+            "chip": "KTMicro KT0210",
+            "firmware_version": get_str(0x04, 2),
+            "build_date": get_str(0x08, 3),
+            "build_time": get_str(0x0C, 2),
+            "commit_hash": get_str(0x10, 2),
+            "vendor": get_str(0x40, 2),
+            "product": get_str(0x48, 5),
+            "batch_id": get_str(0x50, 3),
+            "usb_vid_pid": "31b2:1112",
+            "active_slot": int(regs.get("0x24", ["0x03"])[0], 16),
+            "raw_registers": regs
+        }
+        return bytes(raw_bytes), meta
+
 
 
 def parse_parametric_eq(text):
@@ -720,6 +821,14 @@ def main():
     sub.add_parser("reset", help="Reset all EQ bands to flat 0 dB")
     sub.add_parser("save", help="Commit current settings to chip's non-volatile flash")
 
+    p_dump = sub.add_parser("dump", help="Dump all 256 hardware registers (1KB binary, JSON, or hex)")
+    p_dump.add_argument("-o", "--output", help="Output file path (.bin or .json)")
+    p_dump.add_argument("--format", choices=["hex", "bin", "json"], default="hex", help="Output format (default: hex)")
+
+    p_noise = sub.add_parser("test-noise", help="Play a white noise test signal through the DSP")
+    p_noise.add_argument("duration", type=float, nargs="?", default=5.0, help="Duration in seconds (default: 5.0)")
+    p_noise.add_argument("--level", type=float, default=-22.0, help="Signal level in dBFS (default: -22.0 dBFS)")
+
     p_web = sub.add_parser("web", help="Launch interactive graphical web interface")
     p_web.add_argument("--port", type=int, default=8844, help="HTTP server port (default: 8844)")
     p_web.add_argument("--no-browser", action="store_true", help="Do not automatically open browser")
@@ -879,6 +988,57 @@ def main():
             with BunnyDSP() as dsp:
                 dsp.commit()
                 print("[OK] Flash updated.")
+
+        elif args.command == "dump":
+            with BunnyDSP() as dsp:
+                raw_bytes, meta = dsp.dump_all_registers()
+                fmt = args.format
+                if args.output:
+                    if args.output.endswith(".bin"):
+                        fmt = "bin"
+                    elif args.output.endswith(".json"):
+                        fmt = "json"
+
+                if fmt == "bin":
+                    out_path = args.output or "bunny_dsp_dump.bin"
+                    with open(out_path, "wb") as f:
+                        f.write(raw_bytes)
+                    print(f"[OK] Dumped {len(raw_bytes)} bytes raw memory to {out_path}")
+                elif fmt == "json":
+                    out_text = json.dumps(meta, indent=2)
+                    if args.output:
+                        with open(args.output, "w") as f:
+                            f.write(out_text + "\n")
+                        print(f"[OK] Dumped JSON registers and metadata to {args.output}")
+                    else:
+                        print(out_text)
+                else:
+                    print("\n-------------------------------------------------")
+                    print("         TANCHJIM BUNNY DSP - Hardware Dump      ")
+                    print("-------------------------------------------------")
+                    print(f" Device    : {meta['device']} ({meta['chip']})")
+                    print(f" Firmware  : v{meta['firmware_version']} ({meta['commit_hash']})")
+                    print(f" Build     : {meta['build_date']} {meta['build_time']}")
+                    print(f" Vendor    : {meta['vendor']}")
+                    print(f" Product   : {meta['product']}")
+                    print(f" Batch ID  : {meta['batch_id']}")
+                    print("-------------------------------------------------")
+                    for offset in range(0, len(raw_bytes), 16):
+                        chunk = raw_bytes[offset:offset+16]
+                        hex_str = " ".join(f"{b:02x}" for b in chunk)
+                        ascii_str = "".join(chr(b) if 32 <= b <= 126 else "." for b in chunk)
+                        reg_start = offset // 4
+                        print(f"0x{reg_start:02x}-0x{reg_start+3:02x}  ({offset:04x}):  {hex_str:<48}  |{ascii_str}|")
+                    print("-------------------------------------------------\n")
+                    if args.output:
+                        with open(args.output, "wb") as f:
+                            f.write(raw_bytes)
+                        print(f"[OK] Saved binary dump to {args.output}")
+
+        elif args.command == "test-noise":
+            play_test_noise(duration=args.duration, level_db=args.level)
+
+
 
     except (PermissionError, TimeoutError, FileNotFoundError) as e:
         print(f"\n{e}", file=sys.stderr)

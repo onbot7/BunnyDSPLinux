@@ -1,0 +1,63 @@
+{
+  "name": "Boundless Vinyl (\u65e0\u754c\u00b7\u9ed1\u80f6)",
+  "description": "All-rounder analog vinyl record tuning: rich organic timbre, gentle highs, musical warmth",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 80,
+      "gain": 2.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 400,
+      "gain": 1.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1800,
+      "gain": 1.5,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 5500,
+      "gain": -1.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": 1.8,
+      "q": 0.9,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

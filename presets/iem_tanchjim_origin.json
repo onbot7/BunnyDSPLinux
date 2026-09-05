@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim ORIGIN Flagship",
+  "description": "Official factory sound curve of flagship Tanchjim ORIGIN DMT-5 driver",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -3.5,
+      "q": 0.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -7.0,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1500,
+      "gain": -4.7,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4000,
+      "gain": -5.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 9000,
+      "gain": -11.0,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Bunny Cinema 3D (\u5154\u8033\u5f71\u9662)",
+  "description": "Cinema immersion: 60Hz sub-bass explosions, clean dialogue clarity, sparkly 8kHz/12kHz details",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 60,
+      "gain": 4.5,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 500,
+      "gain": -1.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 2000,
+      "gain": 2.8,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 8000,
+      "gain": 2.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 1.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

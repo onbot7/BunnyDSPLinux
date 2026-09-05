@@ -1,0 +1,63 @@
+{
+  "name": "Crinacle Zero:2 Target",
+  "description": "Combines 7Hz x Crinacle Zero:2 rich sub-bass shelf with Bunny treble clarity",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": 1.5,
+      "q": 0.1,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 50,
+      "gain": 3.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 150,
+      "gain": 1.5,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 800,
+      "gain": 1.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 1.5,
+      "q": 1.8,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Bunny Beats Fit Pro Sound Target",
+  "description": "Tuned after Beats Fit Pro: energetic bass and engaging consumer tuning (Top #2 Community EQ)",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": 3.0,
+      "q": 0.3,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 600,
+      "gain": -8.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1800,
+      "gain": -3.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 3200,
+      "gain": 6.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 5800,
+      "gain": -5.0,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

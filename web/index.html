@@ -507,10 +507,44 @@
       border-radius: 8px;
       padding: 14px 20px;
       display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .preset-header-row {
+      display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
+    }
+    .preset-cat-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #0f0f0f;
+      padding: 2px 4px;
+      border-radius: 6px;
+      border: 1px solid #202020;
+    }
+    .preset-cat-tab {
+      background: transparent;
+      border: none;
+      color: #888888;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.70rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-cat-tab:hover {
+      color: #ffffff;
+    }
+    .preset-cat-tab.active {
+      background: #1e293b;
+      color: var(--accent);
+      font-weight: 600;
     }
     .preset-pill-group {
       display: flex;
@@ -738,18 +772,96 @@
 
     <!-- Bottom Inspector / Presets -->
     <div class="bottom-card">
-      <div style="display:flex; flex-direction:column; gap:4px;">
-        <span class="card-label">Presets</span>
-        <div class="preset-pill-group">
-          <button class="pill" data-preset="harman">Harman IEM 2019v2</button>
-          <button class="pill" data-preset="bass">Bass Boost (+4.5dB)</button>
-          <button class="pill" data-preset="vocal">Vocal Forward</button>
-          <button class="pill" data-preset="treble">Treble Tame</button>
-          <button class="pill" data-preset="flat">Flat Neutral</button>
+      <div class="preset-header-row">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span class="card-label">Presets</span>
+          <div class="preset-cat-tabs">
+            <button class="preset-cat-tab active" data-cat="stock">Stock Official</button>
+            <button class="preset-cat-tab" data-cat="gaming">Tactical Gaming</button>
+            <button class="preset-cat-tab" data-cat="community">Community</button>
+            <button class="preset-cat-tab" data-cat="other-iems">Other IEMs</button>
+            <button class="preset-cat-tab" data-cat="reference">Reference</button>
+          </div>
         </div>
+        <div class="toast" id="toastMsg">Ready. Click Connect to read active filters.</div>
       </div>
 
-      <div class="toast" id="toastMsg">Ready. Click Connect to read active filters.</div>
+      <!-- Stock Official Category -->
+      <div class="preset-pill-group" id="cat-stock">
+        <button class="pill" data-preset="stock_default">Official Default</button>
+        <button class="pill" data-preset="stock_natural">Natural Sound</button>
+        <button class="pill" data-preset="stock_balanced">Balanced (Harman 2013)</button>
+        <button class="pill" data-preset="stock_pop">Pop (Harman 2016)</button>
+        <button class="pill" data-preset="stock_instrument">Instrument (Harman 2019)</button>
+      </div>
+
+      <!-- Tactical Gaming Category -->
+      <div class="preset-pill-group" id="cat-gaming" style="display:none;">
+        <button class="pill" data-preset="game_cs2">CS2</button>
+        <button class="pill" data-preset="game_valorant">Valorant</button>
+        <button class="pill" data-preset="game_pubg">PUBG</button>
+        <button class="pill" data-preset="game_apex">Apex Legends</button>
+        <button class="pill" data-preset="game_tarkov">Escape from Tarkov</button>
+        <button class="pill" data-preset="game_cod">Call of Duty</button>
+        <button class="pill" data-preset="game_wukong">Black Myth: Wukong</button>
+        <button class="pill" data-preset="game_r6siege">R6 Siege</button>
+      </div>
+
+      <!-- Community Category -->
+      <div class="preset-pill-group" id="cat-community" style="display:none;">
+        <button class="pill" data-preset="community_orpheus">HE-1 Orpheus</button>
+        <button class="pill" data-preset="community_beats">Beats Fit Pro</button>
+        <button class="pill" data-preset="community_vinyl">Boundless Vinyl</button>
+        <button class="pill" data-preset="community_vocal_king">Vocal King</button>
+        <button class="pill" data-preset="community_zero_fatigue">Zero Fatigue</button>
+        <button class="pill" data-preset="community_subbass_bomb">Sub-Bass Bomb</button>
+        <button class="pill" data-preset="community_sweet_ballad">Sweet Ballad</button>
+        <button class="pill" data-preset="community_cinema">Bunny Cinema</button>
+        <button class="pill" data-preset="community_all_rounder">All-Rounder</button>
+        <button class="pill" data-preset="community_kpop_female">K-Pop Vocals</button>
+        <button class="pill" data-preset="community_metal_rock">Metal & Rock</button>
+        <button class="pill" data-preset="community_clear_stage">Clear Stage</button>
+        <button class="pill" data-preset="community_xenns_tea_pro">Xenns Tea Pro</button>
+        <button class="pill" data-preset="community_crin_zero2">Crinacle Zero:2</button>
+        <button class="pill" data-preset="community_acg_female_vocal">Poisonous ACG Vocals</button>
+        <button class="pill" data-preset="community_transparent_vocal">Transparent Vocals</button>
+        <button class="pill" data-preset="community_v_shaped">V-Shaped Slam</button>
+        <button class="pill" data-preset="community_fatigue_free">Fatigue-Free</button>
+        <button class="pill" data-preset="community_safe_harman">Safe Harman 2019</button>
+        <button class="pill" data-preset="community_flagship_clean">Flagship Tier Clean</button>
+      </div>
+
+      <!-- Other IEMs Category -->
+      <div class="preset-pill-group" id="cat-other-iems" style="display:none;">
+        <button class="pill" data-preset="iem_tanchjim_one">Tanchjim ONE</button>
+        <button class="pill" data-preset="iem_tanchjim_zero">Tanchjim ZERO</button>
+        <button class="pill" data-preset="iem_tanchjim_tanya">Tanchjim TANYA</button>
+        <button class="pill" data-preset="iem_tanchjim_4u">Tanchjim 4U</button>
+        <button class="pill" data-preset="iem_tanchjim_origin">Tanchjim ORIGIN</button>
+        <button class="pill" data-preset="iem_tanchjim_fola">Tanchjim FOLA (5128)</button>
+        <button class="pill" data-preset="iem_tanchjim_mino">Tanchjim MINO</button>
+        <button class="pill" data-preset="iem_space_pro_tube">SPACE PRO Tube</button>
+        <button class="pill" data-preset="iem_space_pro_vinyl">SPACE PRO Vinyl</button>
+        <button class="pill" data-preset="iem_tanchjim_ola">Tanchjim OLA</button>
+        <button class="pill" data-preset="iem_tanchjim_ola_natural">OLA Natural</button>
+        <button class="pill" data-preset="iem_tanchjim_ola_balanced">OLA Balanced</button>
+        <button class="pill" data-preset="iem_tanchjim_ola2_default">Tanchjim OLA II</button>
+        <button class="pill" data-preset="iem_tanchjim_ola2_theater">OLA II Theater</button>
+        <button class="pill" data-preset="iem_tanchjim_ola2_pop">OLA II Pop</button>
+        <button class="pill" data-preset="iem_tanchjim_ola2_ambient">OLA II Ambient</button>
+        <button class="pill" data-preset="iem_tanchjim_ola2_instrument">OLA II Instrument</button>
+        <button class="pill" data-preset="iem_final_e500">Final Audio E500 (ASMR)</button>
+        <button class="pill" data-preset="iem_simgot_ew200">Simgot EW200</button>
+      </div>
+
+      <!-- Reference Category -->
+      <div class="preset-pill-group" id="cat-reference" style="display:none;">
+        <button class="pill" data-preset="harman">Harman IEM 2019v2</button>
+        <button class="pill" data-preset="bass">Bass Boost (+4.5dB)</button>
+        <button class="pill" data-preset="vocal">Vocal Forward</button>
+        <button class="pill" data-preset="treble">Treble Tame</button>
+        <button class="pill" data-preset="flat">Flat Neutral</button>
+      </div>
     </div>
   </main>
 
@@ -842,7 +954,753 @@
     };
 
     const PRESETS = {
+      // Official Tanchjim Factory Stock Presets
+      stock_default: {
+        name: "Official Default (Tanchjim Target)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 800, gain: -0.3, q: 0.5, type: "PK" },
+          { freq: 1700, gain: -4.0, q: 0.6, type: "PK" },
+          { freq: 7500, gain: -6.0, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      stock_natural: {
+        name: "Official Natural Sound (Flat Response)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -6.0, q: 0.2, type: "PK" },
+          { freq: 200, gain: -4.6, q: 0.5, type: "PK" },
+          { freq: 900, gain: -2.5, q: 0.5, type: "PK" },
+          { freq: 2600, gain: -4.0, q: 1.0, type: "PK" },
+          { freq: 7500, gain: -5.5, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      stock_balanced: {
+        name: "Official Balanced (Harman 2013)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -6.5, q: 0.2, type: "PK" },
+          { freq: 200, gain: -5.7, q: 0.5, type: "PK" },
+          { freq: 800, gain: -0.5, q: 0.5, type: "PK" },
+          { freq: 1600, gain: -4.0, q: 0.8, type: "PK" },
+          { freq: 7500, gain: -5.5, q: 1.2, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      stock_pop: {
+        name: "Official Pop (Harman 2016)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -0.7, q: 1.4, type: "PK" },
+          { freq: 200, gain: -6.5, q: 0.5, type: "PK" },
+          { freq: 800, gain: -1.2, q: 0.4, type: "PK" },
+          { freq: 1800, gain: -3.8, q: 0.9, type: "PK" },
+          { freq: 7500, gain: -6.0, q: 1.2, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      stock_instrument: {
+        name: "Official Instrument (Harman 2019)",
+        pregain: 0.0,
+        bands: [
+          { freq: 200, gain: -6.5, q: 0.4, type: "PK" },
+          { freq: 1400, gain: -3.3, q: 0.9, type: "PK" },
+          { freq: 2000, gain: -1.5, q: 1.2, type: "PK" },
+          { freq: 2900, gain: -2.0, q: 2.5, type: "PK" },
+          { freq: 7500, gain: -3.0, q: 2.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+      // Official Tactical Gaming Presets
+      game_cs2: {
+        name: "CS2 (Footsteps & Defuse)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.4, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 9000, gain: 0.0, q: 0.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_valorant: {
+        name: "Valorant (Footstep Priority)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4300, gain: -6.5, q: 0.6, type: "PK" },
+          { freq: 8000, gain: 0.6, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_pubg: {
+        name: "PUBG (Gunfire Localization)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.4, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 9000, gain: 0.0, q: 1.1, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_apex: {
+        name: "Apex Legends (Vertical Audio)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 10000, gain: 0.0, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_tarkov: {
+        name: "Escape from Tarkov (Creep Audio)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 6000, gain: 0.0, q: 0.7, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_cod: {
+        name: "Call of Duty (High-Tempo Combat)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.6, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 10000, gain: 0.0, q: 1.1, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_wukong: {
+        name: "Black Myth: Wukong (Cinematic Impact)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.4, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 12000, gain: 0.0, q: 1.1, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      game_r6siege: {
+        name: "Rainbow Six Siege (Wall Audio)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -6.0, q: 0.5, type: "PK" },
+          { freq: 1400, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 4700, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 7000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+      // Community Flagship Tunings
+      community_orpheus: {
+        name: "Sennheiser HE-1 Orpheus Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -6.9, q: 0.2, type: "PK" },
+          { freq: 600, gain: 2.4, q: 0.5, type: "PK" },
+          { freq: 1800, gain: -3.1, q: 1.4, type: "PK" },
+          { freq: 3200, gain: 6.5, q: 4.1, type: "PK" },
+          { freq: 5800, gain: 4.2, q: 1.7, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_beats: {
+        name: "Beats Fit Pro Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 3.0, q: 0.3, type: "PK" },
+          { freq: 600, gain: -8.5, q: 0.5, type: "PK" },
+          { freq: 1800, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 3200, gain: 6.0, q: 0.8, type: "PK" },
+          { freq: 5800, gain: -5.0, q: 0.6, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+
+      // More Top Community Presets
+      community_vinyl: {
+        name: "Boundless Vinyl (无界·黑胶)",
+        pregain: 0.0,
+        bands: [
+          { freq: 80, gain: 2.0, q: 0.6, type: "PK" },
+          { freq: 400, gain: 1.0, q: 0.8, type: "PK" },
+          { freq: 1800, gain: 1.5, q: 0.7, type: "PK" },
+          { freq: 5500, gain: -1.0, q: 1.2, type: "PK" },
+          { freq: 10000, gain: 1.8, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_vocal_king: {
+        name: "Vocal King (通透暖声·人声王者)",
+        pregain: 0.0,
+        bands: [
+          { freq: 80, gain: 1.5, q: 0.5, type: "PK" },
+          { freq: 5000, gain: 2.0, q: 2.5, type: "PK" },
+          { freq: 500, gain: 3.0, q: 1.0, type: "PK" },
+          { freq: 2000, gain: 3.5, q: 2.0, type: "PK" },
+          { freq: 9000, gain: 2.5, q: 2.5, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_zero_fatigue: {
+        name: "Zero Fatigue Master (零疲劳终章)",
+        pregain: 0.0,
+        bands: [
+          { freq: 80, gain: 3.2, q: 0.4, type: "PK" },
+          { freq: 320, gain: 1.2, q: 0.5, type: "PK" },
+          { freq: 1600, gain: 2.3, q: 0.6, type: "PK" },
+          { freq: 4200, gain: -2.5, q: 1.2, type: "PK" },
+          { freq: 11000, gain: -1.8, q: 0.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_subbass_bomb: {
+        name: "Sub-Bass Bomb (短视频核弹低音)",
+        pregain: 0.0,
+        bands: [
+          { freq: 63, gain: 5.0, q: 0.3, type: "PK" },
+          { freq: 250, gain: 3.5, q: 0.5, type: "PK" },
+          { freq: 1600, gain: 2.2, q: 0.7, type: "PK" },
+          { freq: 6200, gain: -2.5, q: 1.0, type: "PK" },
+          { freq: 12000, gain: 1.5, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_sweet_ballad: {
+        name: "Sweet Ballads (软萌兔兔情歌档)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 1.3, q: 0.4, type: "PK" },
+          { freq: 110, gain: 2.2, q: 0.7, type: "PK" },
+          { freq: 1700, gain: 2.4, q: 0.5, type: "PK" },
+          { freq: 5300, gain: -2.8, q: 1.7, type: "PK" },
+          { freq: 9500, gain: 2.2, q: 0.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_cinema: {
+        name: "Bunny Cinema 3D (兔耳影院)",
+        pregain: 0.0,
+        bands: [
+          { freq: 60, gain: 4.5, q: 0.4, type: "PK" },
+          { freq: 500, gain: -1.0, q: 0.6, type: "PK" },
+          { freq: 2000, gain: 2.8, q: 0.7, type: "PK" },
+          { freq: 8000, gain: 2.0, q: 1.0, type: "PK" },
+          { freq: 12000, gain: 1.5, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_all_rounder: {
+        name: "Universal All-Rounder (全曲风杂食)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 1.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: 0.0, q: 0.5, type: "PK" },
+          { freq: 800, gain: -1.5, q: 0.5, type: "PK" },
+          { freq: 1700, gain: 4.0, q: 0.6, type: "PK" },
+          { freq: 7500, gain: 3.5, q: 0.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_kpop_female: {
+        name: "K-Pop Female Vocals (K-Pop女声)",
+        pregain: 0.0,
+        bands: [
+          { freq: 50, gain: 2.0, q: 1.0, type: "PK" },
+          { freq: 600, gain: -0.5, q: 0.5, type: "PK" },
+          { freq: 1800, gain: -1.4, q: 1.4, type: "PK" },
+          { freq: 3200, gain: 4.5, q: 4.1, type: "PK" },
+          { freq: 5800, gain: 3.0, q: 1.7, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_metal_rock: {
+        name: "Metal & Hard Rock (Metal Tenchijm)",
+        pregain: 0.0,
+        bands: [
+          { freq: 60, gain: 3.0, q: 0.8, type: "PK" },
+          { freq: 250, gain: -2.0, q: 1.2, type: "PK" },
+          { freq: 800, gain: -1.5, q: 1.5, type: "PK" },
+          { freq: 4000, gain: 2.5, q: 1.2, type: "PK" },
+          { freq: 10000, gain: 2.0, q: 1.5, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_clear_stage: {
+        name: "Clear Soundstage (CLEAR STAGE)",
+        pregain: 0.0,
+        bands: [
+          { freq: 80, gain: 1.5, q: 0.8, type: "PK" },
+          { freq: 200, gain: 1.5, q: 1.0, type: "PK" },
+          { freq: 3000, gain: 1.5, q: 2.5, type: "PK" },
+          { freq: 6000, gain: -2.0, q: 2.0, type: "PK" },
+          { freq: 12000, gain: 1.5, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+      // Other IEM Targets & Emulations
+      iem_tanchjim_one: {
+        name: "Tanchjim ONE Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 50, gain: -2.5, q: 0.5, type: "PK" },
+          { freq: 200, gain: -4.0, q: 0.8, type: "PK" },
+          { freq: 1400, gain: -1.5, q: 2.0, type: "PK" },
+          { freq: 6000, gain: -5.0, q: 1.5, type: "PK" },
+          { freq: 8300, gain: -2.0, q: 5.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_zero: {
+        name: "Tanchjim ZERO Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 52, gain: 8.0, q: 0.3, type: "PK" },
+          { freq: 220, gain: -5.6, q: 0.5, type: "PK" },
+          { freq: 900, gain: 2.0, q: 2.2, type: "PK" },
+          { freq: 1260, gain: -2.8, q: 2.5, type: "PK" },
+          { freq: 9060, gain: -3.0, q: 8.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_tanya: {
+        name: "Tanchjim TANYA Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 110, gain: -6.9, q: 0.6, type: "PK" },
+          { freq: 1410, gain: 2.4, q: 2.5, type: "PK" },
+          { freq: 1540, gain: -6.0, q: 2.0, type: "PK" },
+          { freq: 3200, gain: -2.5, q: 2.5, type: "PK" },
+          { freq: 650, gain: -0.8, q: 1.5, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_4u: {
+        name: "Tanchjim 4U Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -5.0, q: 0.3, type: "PK" },
+          { freq: 200, gain: -4.7, q: 0.6, type: "PK" },
+          { freq: 1500, gain: -3.0, q: 0.6, type: "PK" },
+          { freq: 4500, gain: -1.0, q: 1.6, type: "PK" },
+          { freq: 7000, gain: -4.0, q: 1.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_origin: {
+        name: "Tanchjim ORIGIN Flagship",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -3.5, q: 0.2, type: "PK" },
+          { freq: 200, gain: -7.0, q: 0.4, type: "PK" },
+          { freq: 1500, gain: -4.7, q: 0.7, type: "PK" },
+          { freq: 4000, gain: -5.0, q: 1.0, type: "PK" },
+          { freq: 9000, gain: -11.0, q: 2.5, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_fola: {
+        name: "Tanchjim FOLA (B&K 5128 Target)",
+        pregain: 0.0,
+        bands: [
+          { freq: 194, gain: -3.6, q: 1.2, type: "PK" },
+          { freq: 566, gain: 2.0, q: 0.8, type: "PK" },
+          { freq: 2598, gain: -3.2, q: 0.2, type: "PK" },
+          { freq: 7785, gain: -3.6, q: 1.1, type: "PK" },
+          { freq: 9102, gain: 2.0, q: 5.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_mino: {
+        name: "Tanchjim MINO (Harman 2019)",
+        pregain: 0.0,
+        bands: [
+          { freq: 200, gain: -9.0, q: 0.4, type: "PK" },
+          { freq: 1400, gain: -3.5, q: 0.7, type: "PK" },
+          { freq: 3000, gain: -5.0, q: 1.5, type: "PK" },
+          { freq: 5500, gain: -6.0, q: 2.0, type: "PK" },
+          { freq: 8600, gain: -6.5, q: 3.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_space_pro_tube: {
+        name: "SPACE PRO (Tube Amp Mode)",
+        pregain: 0.0,
+        bands: [
+          { freq: 40, gain: 3.0, q: 0.75, type: "PK" },
+          { freq: 200, gain: 2.0, q: 0.75, type: "PK" },
+          { freq: 3000, gain: -2.0, q: 0.75, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_space_pro_vinyl: {
+        name: "SPACE PRO (Vinyl Record Mode)",
+        pregain: 0.0,
+        bands: [
+          { freq: 40, gain: 4.0, q: 1.0, type: "PK" },
+          { freq: 250, gain: 3.0, q: 1.0, type: "PK" },
+          { freq: 4000, gain: 1.0, q: 3.0, type: "PK" },
+          { freq: 12000, gain: 3.0, q: 3.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_final_e500: {
+        name: "Final Audio E500 (ASMR King)",
+        pregain: 0.0,
+        bands: [
+          { freq: 224, gain: 4.3, q: 1.2, type: "PK" },
+          { freq: 415, gain: 1.1, q: 1.5, type: "PK" },
+          { freq: 2477, gain: -3.3, q: 1.0, type: "PK" },
+          { freq: 4069, gain: -1.2, q: 3.1, type: "PK" },
+          { freq: 10000, gain: -2.2, q: 0.7, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_simgot_ew200: {
+        name: "Simgot EW200 Emulation",
+        pregain: 0.0,
+        bands: [
+          { freq: 87, gain: -6.7, q: 2.9, type: "PK" },
+          { freq: 130, gain: 0.1, q: 2.2, type: "PK" },
+          { freq: 620, gain: -5.8, q: 0.7, type: "PK" },
+          { freq: 4800, gain: -0.1, q: 2.7, type: "PK" },
+          { freq: 10000, gain: -0.8, q: 2.3, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+
+      // More Community Hits
+      community_xenns_tea_pro: {
+        name: "Xenns Tea Pro Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 4.9, q: 0.4, type: "PK" },
+          { freq: 2200, gain: 1.4, q: 2.5, type: "PK" },
+          { freq: 3300, gain: -1.9, q: 2.0, type: "PK" },
+          { freq: 8000, gain: -2.5, q: 6.1, type: "PK" },
+          { freq: 10000, gain: 6.2, q: 1.4, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_crin_zero2: {
+        name: "Crinacle Zero:2 Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 1.5, q: 0.1, type: "PK" },
+          { freq: 50, gain: 3.0, q: 0.6, type: "PK" },
+          { freq: 150, gain: 1.5, q: 0.8, type: "PK" },
+          { freq: 800, gain: 1.0, q: 1.0, type: "PK" },
+          { freq: 12000, gain: 1.5, q: 1.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_acg_female_vocal: {
+        name: "Poisonous Female Vocals (女声毒)",
+        pregain: 0.0,
+        bands: [
+          { freq: 125, gain: -2.0, q: 1.4, type: "PK" },
+          { freq: 500, gain: -1.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 4000, gain: 2.0, q: 1.4, type: "PK" },
+          { freq: 8000, gain: -1.0, q: 1.4, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_transparent_vocal: {
+        name: "Silky Transparent Vocals (通透顺滑)",
+        pregain: 0.0,
+        bands: [
+          { freq: 90, gain: 1.5, q: 0.7, type: "PK" },
+          { freq: 400, gain: 1.0, q: 1.2, type: "PK" },
+          { freq: 2000, gain: 2.4, q: 1.5, type: "PK" },
+          { freq: 6200, gain: 3.0, q: 1.2, type: "PK" },
+          { freq: 12000, gain: 1.0, q: 2.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_v_shaped: {
+        name: "Classic V-Shaped Energy",
+        pregain: 0.0,
+        bands: [
+          { freq: 32, gain: 6.0, q: 0.7, type: "PK" },
+          { freq: 150, gain: 2.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: -3.0, q: 0.5, type: "PK" },
+          { freq: 6000, gain: 3.5, q: 1.0, type: "PK" },
+          { freq: 12000, gain: 2.5, q: 1.2, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_fatigue_free: {
+        name: "Fatigue-Free Comfort",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -1.4, q: 0.1, type: "PK" },
+          { freq: 200, gain: -1.8, q: 0.3, type: "PK" },
+          { freq: 2000, gain: -5.9, q: 0.2, type: "PK" },
+          { freq: 5000, gain: -4.4, q: 0.2, type: "PK" },
+          { freq: 20000, gain: -5.6, q: 0.6, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_safe_harman: {
+        name: "Safe Harman 2019 Target",
+        pregain: 0.0,
+        bands: [
+          { freq: 80, gain: 6.0, q: 0.7, type: "PK" },
+          { freq: 250, gain: -1.5, q: 1.0, type: "PK" },
+          { freq: 3000, gain: 2.0, q: 1.2, type: "PK" },
+          { freq: 5500, gain: -2.0, q: 2.0, type: "PK" },
+          { freq: 10000, gain: 2.0, q: 0.8, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      community_flagship_clean: {
+        name: "Flagship Tier Separation",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: 5.5, q: 0.5, type: "PK" },
+          { freq: 200, gain: -2.5, q: 0.8, type: "PK" },
+          { freq: 1200, gain: -1.5, q: 1.5, type: "PK" },
+          { freq: 3200, gain: 2.5, q: 2.0, type: "PK" },
+          { freq: 8000, gain: -2.0, q: 3.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+
+      // OLA & OLA II
+      iem_tanchjim_ola: {
+        name: "Tanchjim OLA (Default)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.2, type: "PK" },
+          { freq: 210, gain: -4.0, q: 0.6, type: "PK" },
+          { freq: 1350, gain: -2.3, q: 1.2, type: "PK" },
+          { freq: 5000, gain: -4.0, q: 1.1, type: "PK" },
+          { freq: 7000, gain: -3.5, q: 1.3, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola_natural: {
+        name: "Tanchjim OLA (Natural)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.2, type: "PK" },
+          { freq: 200, gain: -3.0, q: 0.7, type: "PK" },
+          { freq: 900, gain: -1.0, q: 1.8, type: "PK" },
+          { freq: 4000, gain: -2.9, q: 1.0, type: "PK" },
+          { freq: 7000, gain: -3.5, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola_balanced: {
+        name: "Tanchjim OLA (Balanced)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -7.0, q: 0.2, type: "PK" },
+          { freq: 210, gain: -4.0, q: 0.6, type: "PK" },
+          { freq: 1350, gain: -2.3, q: 1.2, type: "PK" },
+          { freq: 5000, gain: -3.5, q: 1.3, type: "PK" },
+          { freq: 7000, gain: -3.0, q: 1.3, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola2_default: {
+        name: "Tanchjim OLA II (Default)",
+        pregain: 0.0,
+        bands: [
+          { freq: 50, gain: 2.0, q: 0.5, type: "PK" },
+          { freq: 551, gain: 2.0, q: 2.3, type: "PK" },
+          { freq: 738, gain: 1.2, q: 3.6, type: "PK" },
+          { freq: 1433, gain: -2.5, q: 1.1, type: "PK" },
+          { freq: 2943, gain: 3.0, q: 3.7, type: "PK" },
+          { freq: 3461, gain: -2.0, q: 0.7, type: "PK" },
+          { freq: 5749, gain: 1.9, q: 4.0, type: "PK" },
+          { freq: 12400, gain: -5.0, q: 3.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola2_theater: {
+        name: "Tanchjim OLA II (Theater)",
+        pregain: 0.0,
+        bands: [
+          { freq: 244, gain: -4.0, q: 1.6, type: "PK" },
+          { freq: 601, gain: 3.0, q: 1.5, type: "PK" },
+          { freq: 1643, gain: -1.5, q: 1.3, type: "PK" },
+          { freq: 2877, gain: 2.8, q: 3.8, type: "PK" },
+          { freq: 4215, gain: 1.0, q: 0.5, type: "PK" },
+          { freq: 6139, gain: 4.9, q: 2.0, type: "PK" },
+          { freq: 9216, gain: 2.0, q: 2.9, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola2_pop: {
+        name: "Tanchjim OLA II (Pop)",
+        pregain: 0.0,
+        bands: [
+          { freq: 27, gain: -1.0, q: 0.1, type: "PK" },
+          { freq: 141, gain: -3.8, q: 0.1, type: "PK" },
+          { freq: 600, gain: 4.1, q: 1.4, type: "PK" },
+          { freq: 1754, gain: -2.3, q: 1.7, type: "PK" },
+          { freq: 3000, gain: 1.5, q: 3.0, type: "PK" },
+          { freq: 6295, gain: 2.0, q: 1.6, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola2_ambient: {
+        name: "Tanchjim OLA II (Ambient)",
+        pregain: 0.0,
+        bands: [
+          { freq: 64, gain: -5.0, q: 0.3, type: "PK" },
+          { freq: 517, gain: 2.3, q: 2.0, type: "PK" },
+          { freq: 2025, gain: -5.5, q: 0.6, type: "PK" },
+          { freq: 2889, gain: 2.4, q: 3.7, type: "PK" },
+          { freq: 10000, gain: -4.8, q: 2.3, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" },
+          { freq: 1000, gain: 0.0, q: 1.0, type: "PK" }
+        ]
+      },
+      iem_tanchjim_ola2_instrument: {
+        name: "Tanchjim OLA II (Instrument)",
+        pregain: 0.0,
+        bands: [
+          { freq: 30, gain: -4.0, q: 0.1, type: "PK" },
+          { freq: 200, gain: -4.0, q: 1.0, type: "PK" },
+          { freq: 505, gain: 1.6, q: 2.0, type: "PK" },
+          { freq: 703, gain: -0.8, q: 3.2, type: "PK" },
+          { freq: 1131, gain: -0.9, q: 2.0, type: "PK" },
+          { freq: 1742, gain: -1.7, q: 1.7, type: "PK" },
+          { freq: 3020, gain: 1.7, q: 3.0, type: "PK" },
+          { freq: 9936, gain: 1.3, q: 3.0, type: "PK" }
+        ]
+      },
+
+      // Audiophile Reference Targets
       harman: {
+        name: "Harman IEM 2019v2",
         pregain: -3.5,
         bands: [
           { freq: 45, gain: 4.5, q: 0.7, type: "LSQ" },
@@ -856,6 +1714,7 @@
         ]
       },
       bass: {
+        name: "Bass Boost (+4.5dB)",
         pregain: -4.0,
         bands: [
           { freq: 32, gain: 3.0, q: 1.0, type: "PK" },
@@ -869,6 +1728,7 @@
         ]
       },
       vocal: {
+        name: "Vocal Forward",
         pregain: -2.0,
         bands: [
           { freq: 80, gain: 0.0, q: 1.0, type: "PK" },
@@ -882,6 +1742,7 @@
         ]
       },
       treble: {
+        name: "Treble Tame",
         pregain: 0.0,
         bands: [
           { freq: 60, gain: 0.0, q: 1.0, type: "PK" },
@@ -895,6 +1756,7 @@
         ]
       },
       flat: {
+        name: "Flat Neutral",
         pregain: 0.0,
         bands: [
           { freq: 32, gain: 0.0, q: 1.0, type: "PK" },
@@ -1606,6 +2468,19 @@
       }
     });
 
+    // Preset category tabs switching
+    document.querySelectorAll(".preset-cat-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".preset-cat-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const cat = tab.dataset.cat;
+        ["stock", "gaming", "community", "other-iems", "reference"].forEach(c => {
+          const el = document.getElementById(`cat-${c}`);
+          if (el) el.style.display = (c === cat) ? "flex" : "none";
+        });
+      });
+    });
+
     // Preset selection buttons
     document.querySelectorAll(".pill").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1616,10 +2491,32 @@
           state.pregain = PRESETS[key].pregain;
           state.bands = JSON.parse(JSON.stringify(PRESETS[key].bands));
           renderUI();
-          document.getElementById("toastMsg").textContent = `Loaded target: ${btn.textContent}`;
+          document.getElementById("toastMsg").textContent = `Loaded preset: ${PRESETS[key].name || btn.textContent}`;
         }
       });
     });
+
+    // Load presets dynamically from local server if backend active
+    async function initPresetsFromBackend() {
+      try {
+        const res = await fetch("/api/presets");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.presets)) {
+          data.presets.forEach(p => {
+            const key = p.name ? p.name.toLowerCase().replace(/[^a-z0-9]/g, "_") : null;
+            if (key && !PRESETS[key]) {
+              PRESETS[key] = {
+                name: p.name,
+                pregain: p.pregain || 0.0,
+                bands: p.bands || []
+              };
+            }
+          });
+        }
+      } catch (e) {}
+    }
+    initPresetsFromBackend();
 
     document.getElementById("resetFlatBtn").addEventListener("click", () => {
       const p = PRESETS.flat;

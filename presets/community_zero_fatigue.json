@@ -1,0 +1,63 @@
+{
+  "name": "Zero Fatigue Master (\u96f6\u75b2\u52b3\u7ec8\u7ae0)",
+  "description": "Cuts sharp sibilance peaks while keeping resolution; comfortable for 3h+ listening sessions",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 80,
+      "gain": 3.2,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 320,
+      "gain": 1.2,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1600,
+      "gain": 2.3,
+      "q": 0.6,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4200,
+      "gain": -2.5,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 11000,
+      "gain": -1.8,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "SPACE PRO (Tube Amp Mode)",
+  "description": "Official Tanchjim SPACE PRO Vacuum Tube amplifier warmth and harmonic emulation",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 40,
+      "gain": 3.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": 2.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 3000,
+      "gain": -2.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 20,
+      "gain": 0.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 20,
+      "gain": 0.0,
+      "q": 0.75,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

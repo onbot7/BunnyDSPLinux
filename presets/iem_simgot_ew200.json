@@ -1,0 +1,63 @@
+{
+  "name": "Simgot EW200 Emulation",
+  "description": "Emulation of Simgot EW200: controlled mid-bass, clean forward vocals, and sparkly highs",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 87,
+      "gain": -6.7,
+      "q": 2.9,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 130,
+      "gain": 0.1,
+      "q": 2.2,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 620,
+      "gain": -5.8,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 4800,
+      "gain": -0.1,
+      "q": 2.7,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": -0.8,
+      "q": 2.3,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Official Instrument Enhancement (Harman 2019)",
+  "description": "Harman 2019 target curve tuning with extended high frequencies and instrument clarity",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 200,
+      "gain": -6.5,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 1400,
+      "gain": -3.3,
+      "q": 0.9,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 2000,
+      "gain": -1.5,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 2900,
+      "gain": -2.0,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 7500,
+      "gain": -3.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

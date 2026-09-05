@@ -1,0 +1,63 @@
+{
+  "name": "Sub-Bass Bomb (\u77ed\u89c6\u9891\u6838\u5f39\u4f4e\u97f3)",
+  "description": "Deep impactful 63Hz chest punch with clean vocals and anti-harshness treble shelf",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 63,
+      "gain": 5.0,
+      "q": 0.3,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 250,
+      "gain": 3.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1600,
+      "gain": 2.2,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 6200,
+      "gain": -2.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 12000,
+      "gain": 1.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

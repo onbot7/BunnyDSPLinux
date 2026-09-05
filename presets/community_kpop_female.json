@@ -1,0 +1,63 @@
+{
+  "name": "K-Pop Female Vocals (K-Pop\u5973\u58f0)",
+  "description": "Enhanced sub-bass with clean ear-gain for K-Pop / J-Pop female lead vocals",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 50,
+      "gain": 2.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 600,
+      "gain": -0.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1800,
+      "gain": -1.4,
+      "q": 1.4,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 3200,
+      "gain": 4.5,
+      "q": 4.1,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 5800,
+      "gain": 3.0,
+      "q": 1.7,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

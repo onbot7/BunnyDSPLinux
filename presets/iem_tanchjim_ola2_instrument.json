@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim OLA II (Instrument)",
+  "description": "Official instrumental profile of Tanchjim OLA II: timbre fidelity and subtle string separation",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": -4.0,
+      "q": 0.1,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 200,
+      "gain": -4.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 505,
+      "gain": 1.6,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 703,
+      "gain": -0.8,
+      "q": 3.2,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 1131,
+      "gain": -0.9,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1742,
+      "gain": -1.7,
+      "q": 1.7,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 3020,
+      "gain": 1.7,
+      "q": 3.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 9936,
+      "gain": 1.3,
+      "q": 3.0,
+      "type": "PK"
+    }
+  ]
+}

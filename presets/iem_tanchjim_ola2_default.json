@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim OLA II (Default)",
+  "description": "Official factory target curve of Tanchjim OLA II (Gen 2 refined diaphragm)",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 50,
+      "gain": 2.0,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 551,
+      "gain": 2.0,
+      "q": 2.3,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 738,
+      "gain": 1.2,
+      "q": 3.6,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 1433,
+      "gain": -2.5,
+      "q": 1.1,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 2943,
+      "gain": 3.0,
+      "q": 3.7,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 3461,
+      "gain": -2.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 5749,
+      "gain": 1.9,
+      "q": 4.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 12400,
+      "gain": -5.0,
+      "q": 3.0,
+      "type": "PK"
+    }
+  ]
+}

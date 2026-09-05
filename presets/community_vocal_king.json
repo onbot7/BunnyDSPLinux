@@ -1,0 +1,63 @@
+{
+  "name": "Vocal King (\u901a\u900f\u6696\u58f0\u00b7\u4eba\u58f0\u738b\u8005)",
+  "description": "Intimate, penetrating vocals with clean sub-bass separation and airy soundstage",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 80,
+      "gain": 1.5,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 5000,
+      "gain": 2.0,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 500,
+      "gain": 3.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 2000,
+      "gain": 3.5,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 9000,
+      "gain": 2.5,
+      "q": 2.5,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

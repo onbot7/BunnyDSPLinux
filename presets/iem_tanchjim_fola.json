@@ -1,0 +1,63 @@
+{
+  "name": "Tanchjim FOLA (B&K 5128)",
+  "description": "Tanchjim FOLA tuned against the modern B&K Type 5128 High-Frequency Head Simulator target",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 194,
+      "gain": -3.6,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 566,
+      "gain": 2.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 2598,
+      "gain": -3.2,
+      "q": 0.2,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 7785,
+      "gain": -3.6,
+      "q": 1.1,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 9102,
+      "gain": 2.0,
+      "q": 5.0,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

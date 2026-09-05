@@ -1,0 +1,63 @@
+{
+  "name": "Sweet Ballads (\u8f6f\u840c\u5154\u5154\u60c5\u6b4c\u6863)",
+  "description": "Lush vocals, smooth upper midrange, zero harshness; tailored for ballads & acoustic tracks",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 30,
+      "gain": 1.3,
+      "q": 0.4,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 110,
+      "gain": 2.2,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 1700,
+      "gain": 2.4,
+      "q": 0.5,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 5300,
+      "gain": -2.8,
+      "q": 1.7,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 9500,
+      "gain": 2.2,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}

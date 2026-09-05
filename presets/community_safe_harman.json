@@ -1,0 +1,63 @@
+{
+  "name": "Safe Harman 2019 Target",
+  "description": "Refined Harman 2019 tuning with broadened soundstage and controlled ear-gain",
+  "pregain": 0.0,
+  "bands": [
+    {
+      "band": 0,
+      "freq": 80,
+      "gain": 6.0,
+      "q": 0.7,
+      "type": "PK"
+    },
+    {
+      "band": 1,
+      "freq": 250,
+      "gain": -1.5,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 2,
+      "freq": 3000,
+      "gain": 2.0,
+      "q": 1.2,
+      "type": "PK"
+    },
+    {
+      "band": 3,
+      "freq": 5500,
+      "gain": -2.0,
+      "q": 2.0,
+      "type": "PK"
+    },
+    {
+      "band": 4,
+      "freq": 10000,
+      "gain": 2.0,
+      "q": 0.8,
+      "type": "PK"
+    },
+    {
+      "band": 5,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 6,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    },
+    {
+      "band": 7,
+      "freq": 1000,
+      "gain": 0.0,
+      "q": 1.0,
+      "type": "PK"
+    }
+  ]
+}
