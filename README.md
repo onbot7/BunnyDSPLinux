@@ -16,7 +16,7 @@ Tanchjim only provides an Android APK to manage their DSP cable. There is no off
 
 You can also **burn your EQ profile straight into the cable's onboard EEPROM flash**. Once saved, the DSP runs your tuning in hardware wherever you plug it in (iPhone 15/16, Android, Mac, Windows, Steam Deck) without needing any background EQ software or drivers.
 
-##### similar[DevicePEQ by jeromeof](https://github.com/jeromeof/devicePEQ)
+##### similar [DevicePEQ by jeromeof](https://github.com/jeromeof/devicePEQ)
 ---
 
 ## Features
@@ -108,37 +108,7 @@ This automatically:
 ### Manual Distribution Instructions
 
 <details>
-<summary><b>Ubuntu / Debian / Pop!_OS / Linux Mint</b></summary>
-
-```bash
-sudo cp 99-tanchjim.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=hidraw
-```
-</details>
-
-<details>
-<summary><b>Arch Linux / Manjaro / EndeavourOS</b></summary>
-
-```bash
-sudo cp 99-tanchjim.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=hidraw
-```
-</details>
-
-<details>
-<summary><b>Fedora / RHEL / CentOS / Rocky Linux</b></summary>
-
-```bash
-sudo cp 99-tanchjim.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=hidraw
-```
-</details>
-
-<details>
-<summary><b>openSUSE (Tumbleweed & Leap)</b></summary>
+<summary><b>Ubuntu / Debian / Pop!_OS / Linux Mint / Fedora / RHEL / CentOS / Rocky Linux / openSUSE (Tumbleweed & Leap) / Arch Linux / Manjaro / EndeavourOS </b></summary>
 
 ```bash
 sudo cp 99-tanchjim.rules /etc/udev/rules.d/
