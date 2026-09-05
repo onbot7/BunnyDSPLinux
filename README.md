@@ -309,7 +309,7 @@ The Tanchjim Bunny DSP communicates through vendor-specific USB HID output repor
 ## Troubleshooting
 
 ### Character device permission denied (`/dev/hidraw*`)
-Your user account does not have permission to access the raw USB device:
+#### Your user account does not have permission to access the raw USB device:
 1. Run `sudo ./install-rules.sh --path`.
 2. Unplug the USB-C cable and plug it back in.
 3. Run `ls -la /dev/hidraw*` to confirm the device node has `crw-rw-rw-` permissions.
