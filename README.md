@@ -16,7 +16,7 @@ Tanchjim only provides an Android APK to manage their DSP cable. There is no off
 
 You can also **burn your EQ profile straight into the cable's onboard EEPROM flash**. Once saved, the DSP runs your tuning in hardware wherever you plug it in (iPhone 15/16, Android, Mac, Windows, Steam Deck) without needing any background EQ software or drivers.
 
-or just use [DevicePEQ by jeromeof](https://github.com/jeromeof/devicePEQ)
+#### or just use [DevicePEQ by jeromeof](https://github.com/jeromeof/devicePEQ)
 ---
 
 ## Features
