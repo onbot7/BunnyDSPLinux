@@ -811,7 +811,7 @@ def main():
     p_pre.add_argument("gain", type=float, help="Pregain in dB (-12 to +12)")
 
     p_mic = sub.add_parser("mic-gain", help="Get or set microphone capture gain")
-    p_mic.add_argument("volume", nargs="?", help="Microphone volume (e.g. 80, 80%, or 0.8)")
+    p_mic.add_argument("volume", nargs="?", help="Microphone volume (e.g. 80, 80%%, or 0.8)")
 
     sub.add_parser("presets", help="List all available presets")
 
