@@ -139,7 +139,7 @@ NixOS Configuration (declarative udev rule):
 ---------------------------------------------------------------------------------
 Copy and paste this one-liner into your /etc/nixos/configuration.nix:
 
-  services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"'';
+  services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"'';
 
 Then apply:
   sudo nixos-rebuild switch
@@ -174,6 +174,12 @@ mkdir -p "$DEST_DIR"
 cp "$SRC_RULE" "$DEST_FILE"
 chmod 644 "$DEST_FILE"
 echo "[OK] Installed $DEST_FILE"
+
+if [[ -n "${SUDO_USER:-}" ]] && [[ "$SUDO_USER" != "root" ]] && getent group plugdev >/dev/null 2>&1; then
+    if usermod -aG plugdev "$SUDO_USER" 2>/dev/null; then
+        echo "[OK] Added $SUDO_USER to plugdev group (log out and back in to apply)."
+    fi
+fi
 
 # 2. Reload udev daemon across various distros
 if command -v udevadm >/dev/null 2>&1; then

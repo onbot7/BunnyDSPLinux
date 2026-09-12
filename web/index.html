@@ -750,7 +750,7 @@
             <span class="control-title">Preamp</span>
           </div>
           <div class="control-inputs">
-            <input type="range" id="pregainSlider" min="-12" max="6" step="0.5" value="0">
+            <input type="range" id="pregainSlider" min="-12" max="12" step="0.5" value="0">
             <span class="knob-val" id="pregainVal" style="width:55px; text-align:right;">0.0 dB</span>
           </div>
         </div>
@@ -760,7 +760,7 @@
             <span class="control-title">Mic Gain</span>
           </div>
           <div class="control-inputs">
-            <input type="range" id="micGainSlider" min="0" max="100" step="1" value="100">
+            <input type="range" id="micGainSlider" min="0" max="150" step="1" value="100">
             <span class="knob-val" id="micGainVal" style="width:55px; text-align:right;">100%</span>
           </div>
         </div>
@@ -907,8 +907,8 @@
         <div style="border-top:1px solid #1c1c1c; padding-top:10px;">
           <div style="font-weight:600; color:#ffffff; margin-bottom:6px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">NixOS One-Liner (configuration.nix)</div>
           <div style="display:flex; align-items:center; gap:6px; background:#080808; border:1px solid #222; border-radius:4px; padding:6px 10px;">
-            <code id="nixosSnippet" style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"'';</code>
-            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('services.udev.extraRules = \'\'SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;31b2&quot;, ATTRS{idProduct}==&quot;1112&quot;, MODE=&quot;0666&quot;, TAG+=&quot;uaccess&quot;\'\';', this)">Copy</button>
+            <code id="nixosSnippet" style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"'';</code>
+            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('services.udev.extraRules = \'\'SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;31b2&quot;, ATTRS{idProduct}==&quot;1112&quot;, MODE=&quot;0660&quot;, GROUP=&quot;plugdev&quot;, TAG+=&quot;uaccess&quot;\'\';', this)">Copy</button>
           </div>
           <div style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">Then run <code style="color:#ffffff; font-family:var(--font-mono);">sudo nixos-rebuild switch</code> (if <code style="color:#fff; font-family:var(--font-mono);">extraRules</code> already exists, append rule inside existing quotes).</div>
         </div>
@@ -1850,6 +1850,19 @@
       renderUI();
     }
 
+    function roundEven(n) {
+      const i = Math.trunc(n);
+      const diff = Math.abs(n - i);
+      if (Math.abs(diff - 0.5) < 1e-7) {
+        return i % 2 === 0 ? i : (n > 0 ? i + 1 : i - 1);
+      }
+      return Math.round(n);
+    }
+
+    function clamp(val, min, max) {
+      return Math.min(Math.max(val, min), max);
+    }
+
     async function webhidWriteAll() {
       const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_WRITE, 0, 0x03, 0, 0, 0]);
       await hidDevice.sendReport(REPORT_ID, slotPkt);
@@ -1860,9 +1873,13 @@
         const gfReg = 0x26 + i * 2;
         const qtReg = gfReg + 1;
 
-        let rawGain = Math.round(b.gain * 10);
+        const gain = clamp(b.gain, -12.0, 12.0);
+        const freq = clamp(b.freq, 20.0, 20000.0);
+        const q = clamp(b.q, 0.1, 10.0);
+
+        let rawGain = roundEven(gain * 10);
         if (rawGain < 0) rawGain += 0x10000;
-        const rawFreq = Math.round(b.freq);
+        const rawFreq = roundEven(freq);
 
         const gfPkt = new Uint8Array([
           gfReg, 0, 0, 0, CMD_WRITE, 0,
@@ -1872,7 +1889,7 @@
         await hidDevice.sendReport(REPORT_ID, gfPkt);
         await new Promise(r => setTimeout(r, 10));
 
-        const rawQ = Math.round(b.q * 1000);
+        const rawQ = roundEven(q * 1000);
         const typeCode = b.type === "LSQ" ? 3 : (b.type === "HSQ" ? 4 : 0);
         const qtPkt = new Uint8Array([
           qtReg, 0, 0, 0, CMD_WRITE, 0,
@@ -1883,7 +1900,7 @@
         await new Promise(r => setTimeout(r, 10));
       }
 
-      const preVal = Math.round(state.pregain) & 0xff;
+      const preVal = roundEven(clamp(state.pregain, -12.0, 12.0)) & 0xff;
       const prePkt = new Uint8Array([0x66, 0, 0, 0, CMD_WRITE, 0, preVal, 0, 0, 0]);
       await hidDevice.sendReport(REPORT_ID, prePkt);
       await new Promise(r => setTimeout(r, 20));
@@ -2216,8 +2233,8 @@
         const rawDb = dbForY(pos.y, bounds);
         const newGain = Math.round((rawDb - state.pregain) * 2) / 2; // snap to 0.5dB
 
-        state.bands[draggingBandIdx].freq = Math.max(20, Math.min(18000, newFreq));
-        state.bands[draggingBandIdx].gain = Math.max(-10, Math.min(10, newGain));
+        state.bands[draggingBandIdx].freq = Math.max(20, Math.min(20000, newFreq));
+        state.bands[draggingBandIdx].gain = Math.max(-12, Math.min(12, newGain));
 
         syncBandToInputs(draggingBandIdx);
         drawSquiglinkGraph();
@@ -2246,7 +2263,7 @@
       if (hit !== null) {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 0.1 : -0.1;
-        const newQ = Math.max(0.2, Math.min(5.0, Math.round((state.bands[hit].q + delta) * 10) / 10));
+        const newQ = Math.max(0.1, Math.min(10.0, Math.round((state.bands[hit].q + delta) * 10) / 10));
         state.bands[hit].q = newQ;
         syncBandToInputs(hit);
         drawSquiglinkGraph();
@@ -2317,7 +2334,7 @@
               <span>Freq</span>
               <span class="knob-val" id="freqVal-${i}">${b.freq} Hz</span>
             </div>
-            <input type="range" class="slider-freq" data-band="${i}" min="20" max="18000" step="10" value="${b.freq}">
+            <input type="range" class="slider-freq" data-band="${i}" min="20" max="20000" step="10" value="${b.freq}">
           </div>
 
           <div class="knob-row">
@@ -2325,7 +2342,7 @@
               <span>Gain</span>
               <span class="knob-val" id="gainVal-${i}">${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)} dB</span>
             </div>
-            <input type="range" class="slider-gain" data-band="${i}" min="-10" max="10" step="0.5" value="${b.gain}">
+            <input type="range" class="slider-gain" data-band="${i}" min="-12" max="12" step="0.5" value="${b.gain}">
           </div>
 
           <div class="knob-row">
@@ -2333,7 +2350,7 @@
               <span>Q Factor</span>
               <span class="knob-val" id="qVal-${i}">${b.q.toFixed(2)}</span>
             </div>
-            <input type="range" class="slider-q" data-band="${i}" min="0.2" max="5.0" step="0.1" value="${b.q}">
+            <input type="range" class="slider-q" data-band="${i}" min="0.1" max="10.0" step="0.1" value="${b.q}">
           </div>
         `;
         container.appendChild(strip);
@@ -2563,7 +2580,7 @@
 
       for (const line of text.split("\n")) {
         const l = line.trim();
-        if (!l || l.startsWith("#")) continue;
+        if (!l || l.startsWith("#") || l.startsWith("//")) continue;
 
         const preM = l.match(/Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*dB/i);
         if (preM) {
@@ -2571,16 +2588,34 @@
           continue;
         }
 
-        const filtM = l.match(/Filter\s+\d+:\s*(?:ON\s+)?(PK|LSQ|HSQ|LSC|HSC|PEAK)?\s*(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+        const filtM = l.match(/^Filter\s+\d+:\s*(.*)$/i);
         if (filtM) {
-          let t = (filtM[1] || "PK").toUpperCase();
-          t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
-          bands.push({
-            freq: parseFloat(filtM[2]),
-            gain: parseFloat(filtM[3]),
-            q: filtM[4] ? parseFloat(filtM[4]) : 1.41,
-            type: t
-          });
+          let rest = filtM[1].trim();
+          let isOff = false;
+          const statusM = rest.match(/^(ON|OFF)\b\s*(.*)$/i);
+          if (statusM) {
+            isOff = statusM[1].toUpperCase() === "OFF";
+            rest = statusM[2].trim();
+          }
+
+          const paramsM = rest.match(/^(?:(PK|LSQ|HSQ|LSC|HSC|PEAK)\s+)?(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+          const hasParams = paramsM && paramsM[2] !== undefined && paramsM[3] !== undefined;
+
+          if (isOff && !hasParams) {
+            bands.push({ freq: 1000, gain: 0.0, q: 1.41, type: "PK" });
+            continue;
+          }
+
+          if (hasParams) {
+            let t = (paramsM[1] || "PK").toUpperCase();
+            t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
+            bands.push({
+              freq: parseFloat(paramsM[2]),
+              gain: isOff ? 0.0 : parseFloat(paramsM[3]),
+              q: paramsM[4] ? parseFloat(paramsM[4]) : 1.41,
+              type: t
+            });
+          }
         }
       }
 
@@ -2600,29 +2635,40 @@
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target.result;
-        try {
-          if (file.name.endsWith(".json") || text.trim().startsWith("{")) {
+        const isJson = file.name.endsWith(".json") || text.trim().startsWith("{");
+        if (isJson) {
+          try {
             const data = JSON.parse(text);
+            const hasValidBand = Array.isArray(data.bands) && data.bands.some(
+              b => b && typeof b === "object" && (b.freq !== undefined || b.gain !== undefined)
+            );
+
+            if (!hasValidBand) {
+              alert(`No valid filter bands found in JSON preset: ${file.name}`);
+              return;
+            }
+
             if (data.pregain !== undefined) state.pregain = data.pregain;
-            if (Array.isArray(data.bands)) {
-              for (let i = 0; i < 8; i++) {
-                if (i < data.bands.length) {
-                  state.bands[i] = {
-                    freq: data.bands[i].freq || 1000,
-                    gain: data.bands[i].gain !== undefined ? data.bands[i].gain : 0.0,
-                    q: data.bands[i].q || 1.0,
-                    type: data.bands[i].type || "PK"
-                  };
-                } else {
-                  state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
-                }
+            for (let i = 0; i < 8; i++) {
+              if (i < data.bands.length) {
+                state.bands[i] = {
+                  freq: data.bands[i].freq || 1000,
+                  gain: data.bands[i].gain !== undefined ? data.bands[i].gain : 0.0,
+                  q: data.bands[i].q || 1.0,
+                  type: data.bands[i].type || "PK"
+                };
+              } else {
+                state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
               }
             }
             renderUI();
             document.getElementById("toastMsg").textContent = `[OK] Loaded preset from ${file.name}`;
             return;
+          } catch (err) {
+            alert(`Malformed JSON in preset file: ${file.name}`);
+            return;
           }
-        } catch (err) {}
+        }
 
         const ok = parseAndApplyAutoEqText(text, file.name);
         if (!ok) {
