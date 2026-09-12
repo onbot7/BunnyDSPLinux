@@ -750,7 +750,7 @@
             <span class="control-title">Preamp</span>
           </div>
           <div class="control-inputs">
-            <input type="range" id="pregainSlider" min="-12" max="6" step="0.5" value="0">
+            <input type="range" id="pregainSlider" min="-12" max="12" step="0.5" value="0">
             <span class="knob-val" id="pregainVal" style="width:55px; text-align:right;">0.0 dB</span>
           </div>
         </div>
@@ -760,7 +760,7 @@
             <span class="control-title">Mic Gain</span>
           </div>
           <div class="control-inputs">
-            <input type="range" id="micGainSlider" min="0" max="100" step="1" value="100">
+            <input type="range" id="micGainSlider" min="0" max="150" step="1" value="100">
             <span class="knob-val" id="micGainVal" style="width:55px; text-align:right;">100%</span>
           </div>
         </div>
@@ -2233,8 +2233,8 @@
         const rawDb = dbForY(pos.y, bounds);
         const newGain = Math.round((rawDb - state.pregain) * 2) / 2; // snap to 0.5dB
 
-        state.bands[draggingBandIdx].freq = Math.max(20, Math.min(18000, newFreq));
-        state.bands[draggingBandIdx].gain = Math.max(-10, Math.min(10, newGain));
+        state.bands[draggingBandIdx].freq = Math.max(20, Math.min(20000, newFreq));
+        state.bands[draggingBandIdx].gain = Math.max(-12, Math.min(12, newGain));
 
         syncBandToInputs(draggingBandIdx);
         drawSquiglinkGraph();
@@ -2263,7 +2263,7 @@
       if (hit !== null) {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 0.1 : -0.1;
-        const newQ = Math.max(0.2, Math.min(5.0, Math.round((state.bands[hit].q + delta) * 10) / 10));
+        const newQ = Math.max(0.1, Math.min(10.0, Math.round((state.bands[hit].q + delta) * 10) / 10));
         state.bands[hit].q = newQ;
         syncBandToInputs(hit);
         drawSquiglinkGraph();
@@ -2334,7 +2334,7 @@
               <span>Freq</span>
               <span class="knob-val" id="freqVal-${i}">${b.freq} Hz</span>
             </div>
-            <input type="range" class="slider-freq" data-band="${i}" min="20" max="18000" step="10" value="${b.freq}">
+            <input type="range" class="slider-freq" data-band="${i}" min="20" max="20000" step="10" value="${b.freq}">
           </div>
 
           <div class="knob-row">
@@ -2342,7 +2342,7 @@
               <span>Gain</span>
               <span class="knob-val" id="gainVal-${i}">${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)} dB</span>
             </div>
-            <input type="range" class="slider-gain" data-band="${i}" min="-10" max="10" step="0.5" value="${b.gain}">
+            <input type="range" class="slider-gain" data-band="${i}" min="-12" max="12" step="0.5" value="${b.gain}">
           </div>
 
           <div class="knob-row">
@@ -2350,7 +2350,7 @@
               <span>Q Factor</span>
               <span class="knob-val" id="qVal-${i}">${b.q.toFixed(2)}</span>
             </div>
-            <input type="range" class="slider-q" data-band="${i}" min="0.2" max="5.0" step="0.1" value="${b.q}">
+            <input type="range" class="slider-q" data-band="${i}" min="0.1" max="10.0" step="0.1" value="${b.q}">
           </div>
         `;
         container.appendChild(strip);

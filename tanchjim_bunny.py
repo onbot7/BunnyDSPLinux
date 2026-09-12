@@ -22,6 +22,7 @@
 # - Flash commit requires ~400ms to complete the page write cycle.
 
 import argparse
+import fcntl
 import glob
 import json
 import os
@@ -65,10 +66,17 @@ WEB_DIR = os.path.join(BASE_DIR, "web")
 PRESETS_DIR = os.path.join(BASE_DIR, "presets")
 
 
+_multi_device_warned = False
+
+
 def find_device():
     # Scan sysfs directly instead of probing /dev/hidraw* nodes. Opening every node
     # causes EACCES on input devices (keyboards/mice) before reaching our audio device.
-    for p in glob.glob("/sys/class/hidraw/hidraw*"):
+    candidates = []
+    hidraw_paths = glob.glob("/sys/class/hidraw/hidraw*")
+    hidraw_paths.sort(key=lambda p: int(re.search(r'(\d+)$', p).group(1)) if re.search(r'(\d+)$', p) else 0)
+
+    for p in hidraw_paths:
         uevent = os.path.join(p, "device", "uevent")
         if not os.path.isfile(uevent):
             continue
@@ -76,18 +84,30 @@ def find_device():
             with open(uevent, "r") as f:
                 content = f.read().lower()
                 if "31b2:1112" in content or (VENDOR_ID in content and PRODUCT_ID in content):
-                    return f"/dev/{os.path.basename(p)}"
+                    candidates.append(f"/dev/{os.path.basename(p)}")
         except (OSError, PermissionError):
             continue
 
     # Fallback: some kernels do not link hidraw under class, inspect hid bus directly
-    for dev in glob.glob("/sys/bus/hid/devices/*31B2:1112*"):
-        raw_dir = os.path.join(dev, "hidraw")
-        if os.path.isdir(raw_dir):
-            nodes = os.listdir(raw_dir)
-            if nodes:
-                return f"/dev/{nodes[0]}"
-    return None
+    if not candidates:
+        for dev in sorted(glob.glob("/sys/bus/hid/devices/*31B2:1112*")):
+            raw_dir = os.path.join(dev, "hidraw")
+            if os.path.isdir(raw_dir):
+                nodes = os.listdir(raw_dir)
+                nodes.sort(key=lambda n: int(re.search(r'(\d+)$', n).group(1)) if re.search(r'(\d+)$', n) else 0)
+                for node in nodes:
+                    candidates.append(f"/dev/{node}")
+
+    candidates = list(dict.fromkeys(candidates))
+    if not candidates:
+        return None
+
+    global _multi_device_warned
+    if len(candidates) > 1 and not _multi_device_warned:
+        print(f"[WARN] Multiple Tanchjim Bunny devices found ({', '.join(candidates)}). Using {candidates[0]}.", file=sys.stderr)
+        _multi_device_warned = True
+
+    return candidates[0]
 
 
 def is_nixos_system():
@@ -363,11 +383,22 @@ class BunnyDSP:
         self.fd = None
         try:
             self.fd = os.open(dev_path, os.O_RDWR)
+            fcntl.flock(self.fd, fcntl.LOCK_EX)
         except OSError as e:
+            if self.fd is not None:
+                try:
+                    os.close(self.fd)
+                except OSError:
+                    pass
+                self.fd = None
             raise PermissionError(f"Failed to open {dev_path}: {e}")
 
     def close(self):
         if self.fd is not None:
+            try:
+                fcntl.flock(self.fd, fcntl.LOCK_UN)
+            except OSError:
+                pass
             try:
                 os.close(self.fd)
             except OSError:

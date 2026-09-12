@@ -1,6 +1,6 @@
 # Tanchjim Bunny DSP Controller for Linux (KT0210)
 <p align="center">
-  <img src="ss/ss.png" alt="Equalizer Interface" width="900">
+  <img src="assets/ui-screenshot.png" alt="Equalizer Interface" width="900">
 </p>
 
 <p align="center">
@@ -305,6 +305,7 @@ The Tanchjim Bunny DSP communicates through vendor-specific USB HID output repor
 
 - **I2C Bus Bridge**: The microcontroller bridges incoming HID reports to an internal I2C bus. Sending packets too fast causes FIFO overruns, so the driver enforces a 10ms delay between register writes.
 - **EEPROM Write Cycle**: The `0x53` flash commit command starts an onboard EEPROM page burn cycle. The microcontroller needs ~350ms to finish writing before accepting new commands.
+- **Device Locking**: The Python driver holds an exclusive `fcntl.flock` on the `/dev/hidraw*` node while active to prevent concurrent process collisions; concurrent CLI/backend commands will block until the active holder finishes. (Browser WebHID access via Chrome operates outside OS file locking).
 
 ---
 
