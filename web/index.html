@@ -907,8 +907,8 @@
         <div style="border-top:1px solid #1c1c1c; padding-top:10px;">
           <div style="font-weight:600; color:#ffffff; margin-bottom:6px; font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;">NixOS One-Liner (configuration.nix)</div>
           <div style="display:flex; align-items:center; gap:6px; background:#080808; border:1px solid #222; border-radius:4px; padding:6px 10px;">
-            <code id="nixosSnippet" style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"'';</code>
-            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('services.udev.extraRules = \'\'SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;31b2&quot;, ATTRS{idProduct}==&quot;1112&quot;, MODE=&quot;0666&quot;, TAG+=&quot;uaccess&quot;\'\';', this)">Copy</button>
+            <code id="nixosSnippet" style="font-family:var(--font-mono); font-size:0.70rem; color:#38bdf8; flex:1; overflow-x:auto; white-space:nowrap;">services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"'';</code>
+            <button class="btn-action" style="padding:2px 8px; font-size:0.68rem; flex-shrink:0;" onclick="copySnippet('services.udev.extraRules = \'\'SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;31b2&quot;, ATTRS{idProduct}==&quot;1112&quot;, MODE=&quot;0660&quot;, GROUP=&quot;plugdev&quot;, TAG+=&quot;uaccess&quot;\'\';', this)">Copy</button>
           </div>
           <div style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">Then run <code style="color:#ffffff; font-family:var(--font-mono);">sudo nixos-rebuild switch</code> (if <code style="color:#fff; font-family:var(--font-mono);">extraRules</code> already exists, append rule inside existing quotes).</div>
         </div>

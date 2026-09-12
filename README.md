@@ -134,8 +134,8 @@ On NixOS, udev rules are managed declaratively in `/etc/nixos/configuration.nix`
 ```nix
 services.udev.extraRules = ''
   # Tanchjim Bunny DSP (KT Micro USB ID 31b2:1112)
-  SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"
-  KERNEL=="hidraw*", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", TAG+="uaccess"
+  SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+  KERNEL=="hidraw*", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"
 '';
 ```
 
@@ -152,6 +152,8 @@ To add `tanchjim-ctl` to your user PATH without root:
 ```
 </details>
 
+*Note: Seat sessions automatically grant access via `uaccess`. For remote/SSH or non-systemd sessions, add your user to `plugdev`: `sudo usermod -aG plugdev $USER`.*
+
 ---
 
 ## Web Equalizer Guide
@@ -160,7 +162,7 @@ Start the local web controller:
 ```bash
 tanchjim-ctl web
 ```
-This opens `http://localhost:8080` in your default browser.
+This opens `http://127.0.0.1:8844` in your default browser.
 
 ### How to Use the Interface
 

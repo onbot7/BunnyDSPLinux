@@ -27,12 +27,14 @@ import json
 import os
 import re
 import select
+import secrets
 import shutil
 import struct
 import subprocess
 import sys
 import threading
 import time
+import urllib.parse
 import webbrowser
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
@@ -101,8 +103,8 @@ def check_device_access(dev_path):
                 f"Permission denied on {dev_path}.\n\n"
                 f"NixOS declarative fix (add to /etc/nixos/configuration.nix):\n"
                 f"  services.udev.extraRules = ''\n"
-                f"    SUBSYSTEM==\"hidraw\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0666\", TAG+=\"uaccess\"\n"
-                f"    KERNEL==\"hidraw*\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0666\", TAG+=\"uaccess\"\n"
+                f"    SUBSYSTEM==\"hidraw\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+                f"    KERNEL==\"hidraw*\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
                 f"  '';\n"
                 f"  Then apply: sudo nixos-rebuild switch\n\n"
                 f"Temporary session override:\n"
@@ -143,7 +145,7 @@ def setup_rules(install_path=False):
         print("\nNixOS detected.")
         print("On NixOS, /etc/udev/rules.d is managed declaratively by the Nix store.")
         print("Add this one-liner to /etc/nixos/configuration.nix:\n")
-        print("  services.udev.extraRules = ''SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", TAG+=\"uaccess\"'';\n")
+        print("  services.udev.extraRules = ''SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"'';\n")
         print("Then apply:")
         print("  sudo nixos-rebuild switch\n")
         return
@@ -151,8 +153,8 @@ def setup_rules(install_path=False):
     rule_path = "/etc/udev/rules.d/99-tanchjim.rules"
     rule_content = (
         "# Udev rule for Tanchjim Bunny DSP (KT Micro 31b2:1112)\n"
-        "SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", TAG+=\"uaccess\"\n"
-        "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", TAG+=\"uaccess\"\n"
+        "SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+        "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
     )
 
     if os.geteuid() == 0:
@@ -164,6 +166,15 @@ def setup_rules(install_path=False):
             if shutil.which("udevadm"):
                 subprocess.run(["udevadm", "control", "--reload-rules"], check=False)
                 subprocess.run(["udevadm", "trigger", "--subsystem-match=hidraw"], check=False)
+            sudo_user = os.environ.get("SUDO_USER")
+            if sudo_user and sudo_user != "root":
+                try:
+                    res = subprocess.run(["getent", "group", "plugdev"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if res.returncode == 0:
+                        subprocess.run(["usermod", "-aG", "plugdev", sudo_user], check=False, stderr=subprocess.DEVNULL)
+                        print(f"[OK] Added {sudo_user} to plugdev group (log out and back in to apply).")
+                except OSError:
+                    pass
             print(f"[OK] Udev rules installed to {rule_path}")
             print("[OK] Reloaded rules. Non-root access active.")
         except OSError as e:
@@ -676,11 +687,22 @@ def print_status_table(status):
 
 class DSPRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
+        self._need_cookie = False
         super().__init__(*args, directory=WEB_DIR, **kwargs)
 
     def log_message(self, format, *args):
         # Suppress noisy HTTP request polling logs
         pass
+
+    def end_headers(self):
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        if getattr(self, "_need_cookie", False) and hasattr(self.server, "auth_token"):
+            self.send_header(
+                "Set-Cookie",
+                f"bunny_token={self.server.auth_token}; Path=/; SameSite=Strict; HttpOnly"
+            )
+        super().end_headers()
 
     def _send_json(self, payload, code=200):
         body = json.dumps(payload).encode("utf-8")
@@ -693,40 +715,101 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
     def _send_err(self, message, code=500):
         self._send_json({"ok": False, "error": str(message)}, code=code)
 
+    def _check_host(self):
+        port = self.server.server_address[1]
+        allowed_hosts = {
+            f"127.0.0.1:{port}",
+            "127.0.0.1",
+            f"localhost:{port}",
+            "localhost",
+            f"[::1]:{port}",
+            "[::1]",
+        }
+        host = self.headers.get("Host", "").strip().lower()
+        return host in allowed_hosts
+
+    def _check_auth(self):
+        token = getattr(self.server, "auth_token", None)
+        if not token:
+            return True
+
+        if self.headers.get("X-Auth-Token") == token:
+            return True
+
+        cookie_header = self.headers.get("Cookie", "")
+        cookies = dict(c.strip().split("=", 1) for c in cookie_header.split(";") if "=" in c)
+        if cookies.get("bunny_token") == token:
+            return True
+
+        parsed = urllib.parse.urlsplit(self.path)
+        qs = urllib.parse.parse_qs(parsed.query)
+        if qs.get("token", [None])[0] == token:
+            return True
+
+        return False
+
     def do_GET(self):
-        if self.path in ("", "/"):
+        if not self._check_host():
+            self._send_err("Invalid Host header", 400)
+            return
+
+        clean_path = urllib.parse.urlsplit(self.path).path
+
+        if clean_path in ("", "/", "/index.html"):
+            self._need_cookie = True
             self.path = "/index.html"
-
-        if self.path == "/api/status":
-            try:
-                with BunnyDSP() as dsp:
-                    self._send_json({"ok": True, "data": dsp.get_all()})
-            except (OSError, TimeoutError, PermissionError) as e:
-                self._send_err(e, 500)
+            super().do_GET()
             return
 
-        if self.path == "/api/mic-gain":
-            vol = get_mic_gain()
-            self._send_json({"ok": True, "volume": vol})
-            return
+        if clean_path.startswith("/api/"):
+            if not self._check_auth():
+                self._send_err("Unauthorized", 401)
+                return
 
-        if self.path == "/api/presets":
-            presets = []
-            if os.path.isdir(PRESETS_DIR):
-                for f in sorted(os.listdir(PRESETS_DIR)):
-                    if not f.endswith(".json"):
-                        continue
-                    try:
-                        with open(os.path.join(PRESETS_DIR, f), "r") as pf:
-                            presets.append(json.load(pf))
-                    except (OSError, json.JSONDecodeError):
-                        continue
-            self._send_json({"ok": True, "presets": presets})
+            if clean_path == "/api/status":
+                try:
+                    with BunnyDSP() as dsp:
+                        self._send_json({"ok": True, "data": dsp.get_all()})
+                except (OSError, TimeoutError, PermissionError) as e:
+                    self._send_err(e, 500)
+                return
+
+            if clean_path == "/api/mic-gain":
+                vol = get_mic_gain()
+                self._send_json({"ok": True, "volume": vol})
+                return
+
+            if clean_path == "/api/presets":
+                presets = []
+                if os.path.isdir(PRESETS_DIR):
+                    for f in sorted(os.listdir(PRESETS_DIR)):
+                        if not f.endswith(".json"):
+                            continue
+                        try:
+                            with open(os.path.join(PRESETS_DIR, f), "r") as pf:
+                                presets.append(json.load(pf))
+                        except (OSError, json.JSONDecodeError):
+                            continue
+                self._send_json({"ok": True, "presets": presets})
+                return
+
+            self._send_err("Not found", 404)
             return
 
         super().do_GET()
 
     def do_POST(self):
+        if not self._check_host():
+            self._send_err("Invalid Host header", 400)
+            return
+
+        clean_path = urllib.parse.urlsplit(self.path).path
+
+        if clean_path.startswith("/api/"):
+            if not self._check_auth():
+                self._send_err("Unauthorized", 401)
+                return
+
         content_len = int(self.headers.get("Content-Length", 0))
         if content_len > 1024 * 1024:  # 1MB sanity limit
             self._send_err("Payload too large", 413)
@@ -734,7 +817,7 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
 
         body = self.rfile.read(content_len).decode("utf-8", errors="replace")
 
-        if self.path == "/api/apply":
+        if clean_path == "/api/apply":
             try:
                 profile = json.loads(body)
                 with BunnyDSP() as dsp:
@@ -746,7 +829,7 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
                 self._send_err(e, 500)
             return
 
-        if self.path == "/api/mic-gain":
+        if clean_path == "/api/mic-gain":
             try:
                 pdata = json.loads(body)
                 vol = float(pdata.get("volume", 1.0))
@@ -756,7 +839,7 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
                 self._send_err(f"Invalid volume payload: {e}", 400)
             return
 
-        if self.path == "/api/reset":
+        if clean_path == "/api/reset":
             try:
                 with BunnyDSP() as dsp:
                     dsp.reset_clear()
@@ -784,6 +867,7 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
 def run_web_server(port=8844, open_browser=True):
     server_address = ("127.0.0.1", port)
     httpd = HTTPServer(server_address, DSPRequestHandler)
+    httpd.auth_token = secrets.token_hex(16)
     url = f"http://127.0.0.1:{port}"
     print(f"Web interface running at: {url}")
     print("Supports Helium / Chrome WebHID and local backend mode.")
@@ -969,8 +1053,20 @@ def main():
                 import urllib.request
                 print(f"Fetching preset from {target}...")
                 req = urllib.request.Request(target, headers={"User-Agent": "tanchjim-ctl/1.0"})
-                with urllib.request.urlopen(req) as resp:
-                    content = resp.read().decode("utf-8")
+                max_bytes = 1024 * 1024
+                deadline = time.monotonic() + 10.0
+                raw = bytearray()
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    while True:
+                        if time.monotonic() > deadline:
+                            raise TimeoutError("Download timed out while receiving preset data.")
+                        chunk = resp.read(65536)
+                        if not chunk:
+                            break
+                        raw.extend(chunk)
+                        if len(raw) > max_bytes:
+                            raise ValueError(f"Preset file exceeds maximum allowed size of {max_bytes // 1024} KB.")
+                content = raw.decode("utf-8")
             elif os.path.exists(target):
                 with open(target, "r") as f:
                     content = f.read()
