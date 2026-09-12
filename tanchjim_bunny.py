@@ -516,10 +516,18 @@ class BunnyDSP:
         time.sleep(0.2)
 
     def apply_profile(self, profile):
-        # Force hardware DSP to custom profile mode
+        if not isinstance(profile, dict):
+            raise ValueError("Invalid profile: expected a dictionary")
+
+        raw_bands = profile.get("bands")
+        if not isinstance(raw_bands, list) or not raw_bands:
+            raise ValueError("Profile contains no bands")
+
+        if not any(isinstance(b, dict) and ("freq" in b or "gain" in b) for b in raw_bands):
+            raise ValueError("Profile contains no valid filter bands")
+
         self.enable_eq(0x03)
 
-        raw_bands = profile.get("bands") or []
         for i in range(min(NUM_BANDS, len(raw_bands))):
             b = raw_bands[i]
             if not isinstance(b, dict):
@@ -592,31 +600,56 @@ def parse_parametric_eq(text):
             pregain = float(pre_m.group(1))
             continue
 
-        filt_m = re.search(
-            r"Filter\s+\d+:\s*(?:ON\s+)?([A-Z_]+)?\s*(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?",
-            line,
-            re.I
-        )
+        filt_m = re.match(r"^Filter\s+\d+:\s*(.*)$", line, re.I)
         if filt_m:
-            raw_type = (filt_m.group(1) or "PK").upper()
-            if raw_type in ("LSQ", "LSC", "LOW_SHELF", "LS"):
-                ftype = "LSQ"
-            elif raw_type in ("HSQ", "HSC", "HIGH_SHELF", "HS"):
-                ftype = "HSQ"
+            rest = filt_m.group(1).strip()
+            status_m = re.match(r"^(ON|OFF)\b\s*(.*)$", rest, re.I)
+            if status_m:
+                is_on = status_m.group(1).upper() != "OFF"
+                rest = status_m.group(2).strip()
             else:
-                ftype = "PK"
+                is_on = True
 
-            freq = float(filt_m.group(2))
-            gain = float(filt_m.group(3))
-            q = float(filt_m.group(4)) if filt_m.group(4) else 1.41
+            params_m = re.search(
+                r"([A-Z_]+)?\s*(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?",
+                rest,
+                re.I
+            ) if rest else None
 
-            bands.append({
-                "band": len(bands),
-                "freq": round(freq),
-                "gain": gain,
-                "q": q,
-                "type": ftype
-            })
+            has_params = params_m and params_m.group(2) is not None and params_m.group(3) is not None
+
+            if not is_on and not has_params:
+                bands.append({
+                    "band": len(bands),
+                    "freq": 1000,
+                    "gain": 0.0,
+                    "q": 1.41,
+                    "type": "PK"
+                })
+                continue
+
+            if has_params:
+                raw_type = (params_m.group(1) or "PK").upper()
+                if raw_type in ("FC", ""):
+                    raw_type = "PK"
+                if raw_type in ("LSQ", "LSC", "LOW_SHELF", "LS"):
+                    ftype = "LSQ"
+                elif raw_type in ("HSQ", "HSC", "HIGH_SHELF", "HS"):
+                    ftype = "HSQ"
+                else:
+                    ftype = "PK"
+
+                freq = float(params_m.group(2))
+                gain = float(params_m.group(3)) if is_on else 0.0
+                q = float(params_m.group(4)) if params_m.group(4) else 1.41
+
+                bands.append({
+                    "band": len(bands),
+                    "freq": round(freq),
+                    "gain": gain,
+                    "q": q,
+                    "type": ftype
+                })
 
     return {
         "pregain": pregain,
@@ -1040,7 +1073,7 @@ def main():
 
 
 
-    except (PermissionError, TimeoutError, FileNotFoundError) as e:
+    except (PermissionError, TimeoutError, FileNotFoundError, ValueError) as e:
         print(f"\n{e}", file=sys.stderr)
         sys.exit(1)
     except OSError as e:

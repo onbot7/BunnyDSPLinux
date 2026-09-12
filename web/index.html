@@ -1850,6 +1850,19 @@
       renderUI();
     }
 
+    function roundEven(n) {
+      const i = Math.trunc(n);
+      const diff = Math.abs(n - i);
+      if (Math.abs(diff - 0.5) < 1e-7) {
+        return i % 2 === 0 ? i : (n > 0 ? i + 1 : i - 1);
+      }
+      return Math.round(n);
+    }
+
+    function clamp(val, min, max) {
+      return Math.min(Math.max(val, min), max);
+    }
+
     async function webhidWriteAll() {
       const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_WRITE, 0, 0x03, 0, 0, 0]);
       await hidDevice.sendReport(REPORT_ID, slotPkt);
@@ -1860,9 +1873,13 @@
         const gfReg = 0x26 + i * 2;
         const qtReg = gfReg + 1;
 
-        let rawGain = Math.round(b.gain * 10);
+        const gain = clamp(b.gain, -12.0, 12.0);
+        const freq = clamp(b.freq, 20.0, 20000.0);
+        const q = clamp(b.q, 0.1, 10.0);
+
+        let rawGain = roundEven(gain * 10);
         if (rawGain < 0) rawGain += 0x10000;
-        const rawFreq = Math.round(b.freq);
+        const rawFreq = roundEven(freq);
 
         const gfPkt = new Uint8Array([
           gfReg, 0, 0, 0, CMD_WRITE, 0,
@@ -1872,7 +1889,7 @@
         await hidDevice.sendReport(REPORT_ID, gfPkt);
         await new Promise(r => setTimeout(r, 10));
 
-        const rawQ = Math.round(b.q * 1000);
+        const rawQ = roundEven(q * 1000);
         const typeCode = b.type === "LSQ" ? 3 : (b.type === "HSQ" ? 4 : 0);
         const qtPkt = new Uint8Array([
           qtReg, 0, 0, 0, CMD_WRITE, 0,
@@ -1883,7 +1900,7 @@
         await new Promise(r => setTimeout(r, 10));
       }
 
-      const preVal = Math.round(state.pregain) & 0xff;
+      const preVal = roundEven(clamp(state.pregain, -12.0, 12.0)) & 0xff;
       const prePkt = new Uint8Array([0x66, 0, 0, 0, CMD_WRITE, 0, preVal, 0, 0, 0]);
       await hidDevice.sendReport(REPORT_ID, prePkt);
       await new Promise(r => setTimeout(r, 20));
@@ -2563,7 +2580,7 @@
 
       for (const line of text.split("\n")) {
         const l = line.trim();
-        if (!l || l.startsWith("#")) continue;
+        if (!l || l.startsWith("#") || l.startsWith("//")) continue;
 
         const preM = l.match(/Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*dB/i);
         if (preM) {
@@ -2571,16 +2588,34 @@
           continue;
         }
 
-        const filtM = l.match(/Filter\s+\d+:\s*(?:ON\s+)?(PK|LSQ|HSQ|LSC|HSC|PEAK)?\s*(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+        const filtM = l.match(/^Filter\s+\d+:\s*(.*)$/i);
         if (filtM) {
-          let t = (filtM[1] || "PK").toUpperCase();
-          t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
-          bands.push({
-            freq: parseFloat(filtM[2]),
-            gain: parseFloat(filtM[3]),
-            q: filtM[4] ? parseFloat(filtM[4]) : 1.41,
-            type: t
-          });
+          let rest = filtM[1].trim();
+          let isOff = false;
+          const statusM = rest.match(/^(ON|OFF)\b\s*(.*)$/i);
+          if (statusM) {
+            isOff = statusM[1].toUpperCase() === "OFF";
+            rest = statusM[2].trim();
+          }
+
+          const paramsM = rest.match(/^(?:(PK|LSQ|HSQ|LSC|HSC|PEAK)\s+)?(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+          const hasParams = paramsM && paramsM[2] !== undefined && paramsM[3] !== undefined;
+
+          if (isOff && !hasParams) {
+            bands.push({ freq: 1000, gain: 0.0, q: 1.41, type: "PK" });
+            continue;
+          }
+
+          if (hasParams) {
+            let t = (paramsM[1] || "PK").toUpperCase();
+            t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
+            bands.push({
+              freq: parseFloat(paramsM[2]),
+              gain: isOff ? 0.0 : parseFloat(paramsM[3]),
+              q: paramsM[4] ? parseFloat(paramsM[4]) : 1.41,
+              type: t
+            });
+          }
         }
       }
 
@@ -2600,29 +2635,40 @@
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target.result;
-        try {
-          if (file.name.endsWith(".json") || text.trim().startsWith("{")) {
+        const isJson = file.name.endsWith(".json") || text.trim().startsWith("{");
+        if (isJson) {
+          try {
             const data = JSON.parse(text);
+            const hasValidBand = Array.isArray(data.bands) && data.bands.some(
+              b => b && typeof b === "object" && (b.freq !== undefined || b.gain !== undefined)
+            );
+
+            if (!hasValidBand) {
+              alert(`No valid filter bands found in JSON preset: ${file.name}`);
+              return;
+            }
+
             if (data.pregain !== undefined) state.pregain = data.pregain;
-            if (Array.isArray(data.bands)) {
-              for (let i = 0; i < 8; i++) {
-                if (i < data.bands.length) {
-                  state.bands[i] = {
-                    freq: data.bands[i].freq || 1000,
-                    gain: data.bands[i].gain !== undefined ? data.bands[i].gain : 0.0,
-                    q: data.bands[i].q || 1.0,
-                    type: data.bands[i].type || "PK"
-                  };
-                } else {
-                  state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
-                }
+            for (let i = 0; i < 8; i++) {
+              if (i < data.bands.length) {
+                state.bands[i] = {
+                  freq: data.bands[i].freq || 1000,
+                  gain: data.bands[i].gain !== undefined ? data.bands[i].gain : 0.0,
+                  q: data.bands[i].q || 1.0,
+                  type: data.bands[i].type || "PK"
+                };
+              } else {
+                state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
               }
             }
             renderUI();
             document.getElementById("toastMsg").textContent = `[OK] Loaded preset from ${file.name}`;
             return;
+          } catch (err) {
+            alert(`Malformed JSON in preset file: ${file.name}`);
+            return;
           }
-        } catch (err) {}
+        }
 
         const ok = parseAndApplyAutoEqText(text, file.name);
         if (!ok) {
