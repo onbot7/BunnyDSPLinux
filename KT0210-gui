@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 1. Test direct python environment
+if python3 -c "import gi; gi.require_version('Gtk', '4.0'); gi.require_version('Adw', '1'); from gi.repository import Gtk, Adw" 2>/dev/null; then
+    exec python3 "$SCRIPT_DIR/gui/main.py" "$@"
+fi
+
+# 2. Transparent fallback for NixOS
+if command -v nix-shell >/dev/null 2>&1; then
+    exec nix-shell -p python3Packages.pygobject3 gtk4 libadwaita gobject-introspection python3Packages.pycairo --run "python3 \"$SCRIPT_DIR/gui/main.py\" $*"
+fi
+
+# 3. Fallback to standard python which prints missing dependency guidance
+exec python3 "$SCRIPT_DIR/gui/main.py" "$@"

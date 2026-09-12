@@ -13,4 +13,15 @@ while [ -h "$PRG" ]; do
 done
 PROJECT_DIR="$(cd "$(dirname "$PRG")" && pwd)"
 
+if [ "$1" = "gui" ]; then
+    shift
+    if [ -x "$PROJECT_DIR/KT0210-gui" ]; then
+        exec "$PROJECT_DIR/KT0210-gui" "$@"
+    elif [ -x "$PROJECT_DIR/kt0210-gui" ]; then
+        exec "$PROJECT_DIR/kt0210-gui" "$@"
+    elif [ -x "$PROJECT_DIR/tanchjim-gui" ]; then
+        exec "$PROJECT_DIR/tanchjim-gui" "$@"
+    fi
+fi
+
 exec python3 "$PROJECT_DIR/tanchjim_bunny.py" "$@"

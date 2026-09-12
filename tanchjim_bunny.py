@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Driver and control interface for Tanchjim Bunny DSP (KT Micro KT0210 codec).
 #
-# Hardware notes from USB packet reverse-engineering:
+# Hardware notes from USB packet analysis:
 # - Device enumerates as USB HID device (VID: 0x31b2, PID: 0x1112).
 # - Vendor configuration is exposed via HID report ID 0x4B (10-byte payload).
 # - Register map:
@@ -833,7 +833,19 @@ def main():
     p_web.add_argument("--port", type=int, default=8844, help="HTTP server port (default: 8844)")
     p_web.add_argument("--no-browser", action="store_true", help="Do not automatically open browser")
 
+    sub.add_parser("gui", help="Launch native Libadwaita desktop application")
+
     args = parser.parse_args()
+
+    if args.command == "gui":
+        gui_launcher = os.path.join(BASE_DIR, "KT0210-gui")
+        if not os.path.exists(gui_launcher):
+            gui_launcher = os.path.join(BASE_DIR, "kt0210-gui")
+        if os.path.exists(gui_launcher):
+            os.execv(gui_launcher, [gui_launcher] + sys.argv[2:])
+        else:
+            from gui.main import run_gui
+            sys.exit(run_gui() or 0)
 
     if not args.command or args.command == "web":
         run_web_server(

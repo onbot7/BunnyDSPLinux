@@ -10,6 +10,9 @@ DEST_FILE="$DEST_DIR/$RULE_NAME"
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_RULE="$SRC_DIR/$RULE_NAME"
 BIN_SRC="$SRC_DIR/tanchjim-ctl"
+GUI_SRC="$SRC_DIR/KT0210-gui"
+DESKTOP_SRC="$SRC_DIR/data/io.github.tanchjim_bunny_dsp.desktop"
+ICON_SRC="$SRC_DIR/data/icons/io.github.tanchjim_bunny_dsp.svg"
 
 usage() {
     cat <<EOF
@@ -80,28 +83,43 @@ if [[ "$ACTION" == "uninstall" ]]; then
         fi
     fi
 
-    # Clean PATH symlinks
-    for target in "/usr/local/bin/tanchjim-ctl" "$HOME/.local/bin/tanchjim-ctl"; do
-        if [[ -L "$target" ]]; then
+    # Clean PATH symlinks & desktop entries
+    for target in "/usr/local/bin/tanchjim-ctl" "$HOME/.local/bin/tanchjim-ctl" \
+                  "/usr/local/bin/KT0210-gui" "$HOME/.local/bin/KT0210-gui" \
+                  "/usr/local/bin/kt0210-gui" "$HOME/.local/bin/kt0210-gui" \
+                  "/usr/local/bin/tanchjim-gui" "$HOME/.local/bin/tanchjim-gui" \
+                  "/usr/local/share/applications/io.github.tanchjim_bunny_dsp.desktop" \
+                  "$HOME/.local/share/applications/io.github.tanchjim_bunny_dsp.desktop"; do
+        if [[ -L "$target" || -f "$target" ]]; then
             rm -f "$target"
-            echo "[OK] Removed symlink $target"
+            echo "[OK] Removed $target"
         fi
     done
     echo "Uninstall complete."
     exit 0
 fi
 
-# PATH symlink helper
+# PATH & Desktop installation helper
 install_bin_to_path() {
-    chmod +x "$BIN_SRC"
+    chmod +x "$BIN_SRC" "$GUI_SRC"
     if [[ $EUID -eq 0 ]]; then
-        mkdir -p "/usr/local/bin"
+        mkdir -p "/usr/local/bin" "/usr/local/share/applications" "/usr/local/share/icons/hicolor/scalable/apps"
         ln -sf "$BIN_SRC" "/usr/local/bin/tanchjim-ctl"
-        echo "[OK] Installed tanchjim-ctl to PATH (/usr/local/bin/tanchjim-ctl)"
+        ln -sf "$GUI_SRC" "/usr/local/bin/KT0210-gui"
+        ln -sf "$GUI_SRC" "/usr/local/bin/kt0210-gui"
+        cp "$DESKTOP_SRC" "/usr/local/share/applications/"
+        cp "$ICON_SRC" "/usr/local/share/icons/hicolor/scalable/apps/"
+        echo "[OK] Installed tanchjim-ctl & KT0210-gui to PATH (/usr/local/bin)"
+        echo "[OK] Installed desktop launcher & icon (/usr/local/share/applications)"
     else
-        mkdir -p "$HOME/.local/bin"
+        mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/scalable/apps"
         ln -sf "$BIN_SRC" "$HOME/.local/bin/tanchjim-ctl"
-        echo "[OK] Installed tanchjim-ctl to user PATH (~/.local/bin/tanchjim-ctl)"
+        ln -sf "$GUI_SRC" "$HOME/.local/bin/KT0210-gui"
+        ln -sf "$GUI_SRC" "$HOME/.local/bin/kt0210-gui"
+        cp "$DESKTOP_SRC" "$HOME/.local/share/applications/"
+        cp "$ICON_SRC" "$HOME/.local/share/icons/hicolor/scalable/apps/"
+        echo "[OK] Installed tanchjim-ctl & KT0210-gui to user PATH (~/.local/bin)"
+        echo "[OK] Installed desktop launcher & icon (~/.local/share/applications)"
         if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
             echo "Note: Ensure ~/.local/bin is in your PATH."
         fi

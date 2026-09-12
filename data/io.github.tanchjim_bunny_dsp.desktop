@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=KT0210
+Comment=Supported: Tanchjim Bunny DSP - Hardware Parametric Equalizer Controller
+Exec=KT0210-gui
+Icon=io.github.tanchjim_bunny_dsp
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Mixer;Settings;HardwareSettings;
+Keywords=equalizer;peq;audio;dsp;tanchjim;bunny;kt0210;iem;headphone;dac;
+StartupNotify=true
+StartupWMClass=io.github.tanchjim_bunny_dsp
