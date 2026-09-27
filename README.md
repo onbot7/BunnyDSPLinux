@@ -134,8 +134,8 @@ On NixOS, udev rules are managed declaratively in `/etc/nixos/configuration.nix`
 ```nix
 services.udev.extraRules = ''
   # Tanchjim Bunny DSP (KT Micro USB ID 31b2:1112)
-  SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"
-  KERNEL=="hidraw*", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+  SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", GROUP="plugdev", TAG+="uaccess"
+  KERNEL=="hidraw*", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", GROUP="plugdev", TAG+="uaccess"
 '';
 ```
 

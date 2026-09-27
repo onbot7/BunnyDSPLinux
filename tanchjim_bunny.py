@@ -123,8 +123,8 @@ def check_device_access(dev_path):
                 f"Permission denied on {dev_path}.\n\n"
                 f"NixOS declarative fix (add to /etc/nixos/configuration.nix):\n"
                 f"  services.udev.extraRules = ''\n"
-                f"    SUBSYSTEM==\"hidraw\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
-                f"    KERNEL==\"hidraw*\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+                f"    SUBSYSTEM==\"hidraw\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+                f"    KERNEL==\"hidraw*\", ATTRS{{idVendor}}==\"31b2\", ATTRS{{idProduct}}==\"1112\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
                 f"  '';\n"
                 f"  Then apply: sudo nixos-rebuild switch\n\n"
                 f"Temporary session override:\n"
@@ -165,7 +165,7 @@ def setup_rules(install_path=False):
         print("\nNixOS detected.")
         print("On NixOS, /etc/udev/rules.d is managed declaratively by the Nix store.")
         print("Add this one-liner to /etc/nixos/configuration.nix:\n")
-        print("  services.udev.extraRules = ''SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"'';\n")
+        print("  services.udev.extraRules = ''SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"'';\n")
         print("Then apply:")
         print("  sudo nixos-rebuild switch\n")
         return
@@ -173,8 +173,8 @@ def setup_rules(install_path=False):
     rule_path = "/etc/udev/rules.d/99-tanchjim.rules"
     rule_content = (
         "# Udev rule for Tanchjim Bunny DSP (KT Micro 31b2:1112)\n"
-        "SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
-        "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+        "SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
+        "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"31b2\", ATTRS{idProduct}==\"1112\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"\n"
     )
 
     if os.geteuid() == 0:
