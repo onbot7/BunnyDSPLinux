@@ -139,7 +139,7 @@ NixOS Configuration (declarative udev rule):
 ---------------------------------------------------------------------------------
 Copy and paste this one-liner into your /etc/nixos/configuration.nix:
 
-  services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0660", GROUP="plugdev", TAG+="uaccess"'';
+  services.udev.extraRules = ''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="31b2", ATTRS{idProduct}=="1112", MODE="0666", GROUP="plugdev", TAG+="uaccess"'';
 
 Then apply:
   sudo nixos-rebuild switch
