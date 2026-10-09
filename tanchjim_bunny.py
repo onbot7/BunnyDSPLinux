@@ -499,6 +499,7 @@ class BunnyDSP:
         bands = [self.read_band(i) for i in range(NUM_BANDS)]
         return {
             "slot": slot,
+            "bypass": slot != 0x03,
             "pregain": pregain,
             "bands": bands,
         }
@@ -545,6 +546,14 @@ class BunnyDSP:
         packet = [REG_SLOT, 0x00, 0x00, 0x00, CMD_WRITE, 0x00, slot, 0x00, 0x00, 0x00]
         self._send_raw_report(packet)
         time.sleep(0.02)
+
+    def set_bypass(self, bypass=True):
+        # 0x02 = bypass (raw signal), 0x03 = custom hardware PEQ
+        slot = 0x02 if bypass else 0x03
+        self.enable_eq(slot)
+
+    def is_bypass(self):
+        return self.read_slot() != 0x03
 
     def commit(self):
         # Flush working SRAM to onboard EEPROM. Requires 350-400ms for internal cycle.
@@ -624,6 +633,13 @@ class BunnyDSP:
 
 
 
+def parse_db_value(val):
+    s = str(val).strip()
+    if s.lower().endswith("db"):
+        s = s[:-2].strip()
+    return float(s)
+
+
 def parse_parametric_eq(text):
     # Parses standard AutoEQ / Squiglink parametric text files:
     #   Preamp: -3.5 dB
@@ -699,12 +715,136 @@ def parse_parametric_eq(text):
     }
 
 
+def fetch_autoeq_index():
+    cache_dir = os.path.expanduser("~/.cache/tanchjim-bunny")
+    cache_file = os.path.join(cache_dir, "autoeq_index.txt")
+    os.makedirs(cache_dir, exist_ok=True)
+
+    use_cache = False
+    if os.path.exists(cache_file):
+        mtime = os.path.getmtime(cache_file)
+        if time.time() - mtime < 7 * 86400:
+            use_cache = True
+
+    if use_cache:
+        with open(cache_file, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+    else:
+        import urllib.request
+        index_url = "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/INDEX.md"
+        print("Fetching AutoEQ database index from GitHub...")
+        req = urllib.request.Request(index_url, headers={"User-Agent": "tanchjim-ctl/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            content = resp.read().decode("utf-8")
+        lines = content.splitlines(keepends=True)
+        with open(cache_file, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+    items = []
+    item_re = re.compile(r"^-\s*\[(.*?)\]\(\./(.*?)\)(?:\s*by\s*(.*?))?$")
+    for line in lines:
+        m = item_re.match(line.strip())
+        if m:
+            name, rel_path, rest = m.group(1), m.group(2), m.group(3) or ""
+            items.append({
+                "name": name,
+                "rel_path": rel_path,
+                "info": rest.strip()
+            })
+    return items
+
+
+def run_autoeq_query(query, pick_index=None, apply_eq=False, output_file=None):
+    items = fetch_autoeq_index()
+    terms = query.lower().split()
+    matches = []
+    for it in items:
+        searchable = f"{it['name']} {it['info']}".lower()
+        if all(term in searchable for term in terms):
+            matches.append(it)
+
+    if not matches:
+        print(f"No AutoEQ profiles found matching '{query}'. Try a broader search term.")
+        return
+
+    if pick_index is not None:
+        idx = pick_index - 1
+        if idx < 0 or idx >= len(matches):
+            print(f"Error: index {pick_index} out of range (1 to {len(matches)}).", file=sys.stderr)
+            sys.exit(1)
+        selected = matches[idx]
+    elif len(matches) == 1:
+        selected = matches[0]
+    else:
+        print(f"\nFound {len(matches)} AutoEQ profiles matching '{query}':")
+        print("-------------------------------------------------")
+        for i, m in enumerate(matches[:25], 1):
+            info_str = f" ({m['info']})" if m['info'] else ""
+            print(f" [{i:>2}] {m['name']}{info_str}")
+        if len(matches) > 25:
+            print(f" ... and {len(matches) - 25} more results. Narrow your search query.")
+        print("-------------------------------------------------")
+        print("Select a profile using -i <number>, e.g.:")
+        print(f"  tanchjim-ctl autoeq \"{query}\" -i 1 --apply\n")
+        return
+
+    rel_path = selected["rel_path"]
+    last_comp = rel_path.rstrip("/").split("/")[-1]
+    url_candidate1 = f"https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/{rel_path}/{last_comp}%20ParametricEQ.txt"
+    url_candidate2 = f"https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/{rel_path}/ParametricEQ.txt"
+
+    import urllib.request
+    print(f"Fetching '{selected['name']}' from AutoEQ...")
+    content = None
+    for target_url in (url_candidate1, url_candidate2):
+        try:
+            req = urllib.request.Request(target_url, headers={"User-Agent": "tanchjim-ctl/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                content = resp.read().decode("utf-8")
+                break
+        except Exception:
+            continue
+
+    if not content:
+        print("Failed to download ParametricEQ.txt from AutoEQ repository.", file=sys.stderr)
+        sys.exit(1)
+
+    profile = parse_parametric_eq(content)
+
+    if output_file:
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"[OK] Saved ParametricEQ file to: {output_file}")
+
+    print("\n-------------------------------------------------")
+    print(f" AutoEQ Profile : {selected['name']}")
+    if selected['info']:
+        print(f" Measured by    : {selected['info']}")
+    print(f" Preamp         : {profile['pregain']:.1f} dB")
+    print("-------------------------------------------------")
+    print(" Band |   Frequency   |    Gain    |   Q   |  Type ")
+    print("-------------------------------------------------")
+    for b in profile["bands"]:
+        print(f"  {b['band']}   |  {b['freq']:>5} Hz    |  {b['gain']:>+5.1f} dB | {b['q']:>5.2f} |  {b['type']}")
+    print("-------------------------------------------------")
+
+    if apply_eq:
+        with BunnyDSP() as dsp:
+            dsp.apply_profile(profile)
+        print("[OK] Profile applied and burned to hardware flash.")
+    elif not output_file:
+        print("To apply to hardware, re-run with --apply:")
+        idx_arg = f" -i {pick_index}" if pick_index else ""
+        print(f"  tanchjim-ctl autoeq \"{query}\"{idx_arg} --apply\n")
+
+
 def print_status_table(status):
     print("-------------------------------------------------")
     print("       TANCHJIM BUNNY DSP - Current Status       ")
     print("-------------------------------------------------")
-    mode_str = "Custom Active" if status.get("slot") == 3 else "Bypass/Disabled"
-    print(f" Mode / Slot : {status.get('slot')} ({mode_str})")
+    slot = status.get("slot")
+    mode_str = "Bypass (Raw sound)" if slot == 2 or status.get("bypass") else ("Custom Active" if slot == 3 else f"Preset {slot}")
+    print(f" Mode / Slot : {slot} ({mode_str})")
     print(f" Pregain     : {status.get('pregain', 0.0):+.1f} dB")
     vol = get_mic_gain()
     print(f" Mic Gain    : {int(round(vol * 100))}% ({vol:.2f})")
@@ -805,6 +945,14 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
                     self._send_err(e, 500)
                 return
 
+            if clean_path == "/api/bypass":
+                try:
+                    with BunnyDSP() as dsp:
+                        self._send_json({"ok": True, "bypass": dsp.is_bypass()})
+                except (OSError, TimeoutError, PermissionError) as e:
+                    self._send_err(e, 500)
+                return
+
             if clean_path == "/api/mic-gain":
                 vol = get_mic_gain()
                 self._send_json({"ok": True, "volume": vol})
@@ -847,6 +995,22 @@ class DSPRequestHandler(SimpleHTTPRequestHandler):
             return
 
         body = self.rfile.read(content_len).decode("utf-8", errors="replace")
+
+        if clean_path == "/api/bypass":
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                with BunnyDSP() as dsp:
+                    if "bypass" in payload:
+                        bypass_state = bool(payload["bypass"])
+                    else:
+                        bypass_state = not dsp.is_bypass()
+                    dsp.set_bypass(bypass_state)
+                self._send_json({"ok": True, "bypass": bypass_state})
+            except (json.JSONDecodeError, ValueError) as e:
+                self._send_err(f"Invalid payload: {e}", 400)
+            except (OSError, TimeoutError, PermissionError) as e:
+                self._send_err(e, 500)
+            return
 
         if clean_path == "/api/apply":
             try:
@@ -956,7 +1120,16 @@ def main():
     p_band.add_argument("--type", choices=["PK", "LSQ", "HSQ"], default="PK", help="Filter type")
 
     p_pre = sub.add_parser("set-pregain", help="Set digital preamp gain in dB")
-    p_pre.add_argument("gain", type=float, help="Pregain in dB (-12 to +12)")
+    p_pre.add_argument("gain", type=parse_db_value, help="Pregain in dB (-12 to +12, e.g. -3.5 or -3.5dB)")
+
+    p_byp = sub.add_parser("bypass", help="Toggle or set hardware EQ bypass (A/B testing)")
+    p_byp.add_argument("state", nargs="?", choices=["on", "off", "toggle", "status"], default="toggle", help="Action: on, off, toggle, or status (default: toggle)")
+
+    p_aeq = sub.add_parser("autoeq", help="Search and download EQ profiles from AutoEq database")
+    p_aeq.add_argument("query", help="Headphone model search query (e.g. 'zero 2', 'aria', 'hd600')")
+    p_aeq.add_argument("-i", "--index", type=int, help="Select result index when multiple matches are found")
+    p_aeq.add_argument("--apply", action="store_true", help="Directly apply profile to Bunny hardware")
+    p_aeq.add_argument("-o", "--output", help="Save downloaded ParametricEQ.txt to a file")
 
     p_mic = sub.add_parser("mic-gain", help="Get or set microphone capture gain")
     p_mic.add_argument("volume", nargs="?", help="Microphone volume (e.g. 80, 80%%, or 0.8)")
@@ -1005,9 +1178,9 @@ def main():
                 if args.format == "json":
                     out_text = json.dumps(data, indent=2)
                 else:
-                    lines = [f"Preamp: {data['pregain']:+.1f} dB"]
+                    lines = [f"Preamp: {data['pregain']:.1f} dB"]
                     for b in data.get("bands", []):
-                        lines.append(f"Filter {b['band']+1}: ON {b['type']} Fc {b['freq']} Hz Gain {b['gain']:+.1f} dB Q {b['q']:.2f}")
+                        lines.append(f"Filter {b['band']+1}: ON {b['type']} Fc {b['freq']} Hz Gain {b['gain']:.1f} dB Q {b['q']:.2f}")
                     out_text = "\n".join(lines)
                 if args.output:
                     with open(args.output, "w") as f:
@@ -1015,6 +1188,26 @@ def main():
                     print(f"Saved to {args.output}")
                 else:
                     print(out_text)
+
+        elif args.command == "bypass":
+            with BunnyDSP() as dsp:
+                current_bypass = dsp.is_bypass()
+                if args.state == "status":
+                    st = "ON (Raw sound)" if current_bypass else "OFF (PEQ active)"
+                    print(f"Hardware Bypass is currently: {st}")
+                else:
+                    new_state = True if args.state == "on" else (False if args.state == "off" else not current_bypass)
+                    dsp.set_bypass(new_state)
+                    st = "ON (Raw sound)" if new_state else "OFF (PEQ active)"
+                    print(f"[OK] Hardware Bypass set to: {st}")
+
+        elif args.command == "autoeq":
+            run_autoeq_query(
+                query=args.query,
+                pick_index=args.index,
+                apply_eq=args.apply,
+                output_file=args.output,
+            )
 
         elif args.command == "set-band":
             with BunnyDSP() as dsp:

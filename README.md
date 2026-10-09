@@ -23,8 +23,14 @@ You can also **burn your EQ profile straight into the cable's onboard EEPROM fla
 
 - **No extra dependencies**: Written using Python 3 standard library. No pip packages or build steps needed.
 - **8-band hardware PEQ**: Peak, low shelf, and high shelf biquad filters calculated with RBJ audio cookbook formulas.
+- **Hardware A/B Bypass**: Instant real-time comparison between custom PEQ and flat stock pass-through (SRAM register toggle, zero flash wear, Spacebar hotkey).
+- **AutoEQ database integration**: Search and fetch over 5,000 headphone EQ profiles directly from the CLI (`tanchjim-ctl autoeq`).
 - **Hardware EEPROM flashing**: Saves your tuning permanently on the cable so it persists across power cycles and works on other devices with 0% host CPU load.
 - **WebHID interface**: Dark-mode equalizer UI inspired by OpenAula. Works natively in Chrome/Brave/Edge over WebHID, or uses a local Python backend in Firefox.
+- **Target Curve Overlays**: Visual reference curves for Harman IE 2019, IEF Neutral, and Diffuse Field.
+- **Tone & Pink Noise Generator**: Pure browser Web Audio signal generator with real-time EQ band frequency tracking for hunting resonances.
+- **Undo / Redo Stack**: Multi-level state history (Ctrl+Z / Ctrl+Y) across all curve drags and slider tweaks.
+- **"My Presets" Shelf**: Save, label, and delete custom sound profiles directly in browser `localStorage`.
 - **Interactive response curve**: Drag nodes for frequency/gain, scroll mouse wheel for Q factor, double-click to reset flat.
 - **Digital preamp**: Adjust gain from -12 dB to +12 dB to prevent digital clipping when boosting frequencies.
 - **Mic gain control**: Adjusts capture sensitivity for the inline mic via PipeWire, PulseAudio, or ALSA.
@@ -173,15 +179,25 @@ This opens `http://127.0.0.1:8844` in your default browser.
    - **Click & Drag**: Move any of the 8 band nodes horizontally for frequency (20 Hz to 20 kHz) and vertically for gain (-12 dB to +12 dB).
    - **Scroll Wheel**: Scroll while hovering over a node to adjust its Q factor.
    - **Double-Click**: Instantly resets that band's gain to 0.0 dB.
-3. **Preamp Slider**:
-   - When boosting frequencies (e.g. +4 dB bass boost), lower the **Preamp** slider by the same amount (e.g. -4 dB) to prevent digital clipping.
-4. **Mic Gain Slider**:
+3. **A/B Hardware Bypass**:
+   - Click **A/B Bypass** or press **Spacebar** to instantly toggle between your custom EQ curve and raw flat audio. Uses fast SRAM switching without flash wear.
+4. **Target Curve Overlays**:
+   - Pick a reference curve (**Harman IE 2019**, **IEF Neutral**, or **Diffuse Field**) from the dropdown in the response curve header to compare your tuning against established targets.
+5. **Tone & Noise Generator**:
+   - In the right sidebar, synthesize **Pink Noise**, pure **Sine Tones**, or **Sine Sweeps** directly in the browser. Check **Track active band** to lock oscillator frequency to whichever EQ band you are currently dragging.
+6. **Undo / Redo Stack**:
+   - Revert or re-apply any adjustments with toolbar **Undo** / **Redo** buttons or hotkeys (**Ctrl+Z** / **Ctrl+Y**).
+7. **"My Presets" Shelf**:
+   - Under the Presets shelf, select the **My Presets** tab and click **+ Save Current** to store custom sound profiles directly in browser storage.
+8. **Preamp Slider**:
+   - When boosting frequencies (e.g. +4 dB bass boost), lower the **Preamp** slider by the same amount (e.g. -4 dB) to prevent digital clipping. Supports negative/positive dB values.
+9. **Mic Gain Slider**:
    - Adjusts capture sensitivity for the inline microphone in real time.
-5. **Importing Presets**:
+10. **Importing Presets**:
    - Click **Load File** or drag-and-drop any `.json` or AutoEQ `.txt` file onto the browser window.
    - Click **Import Text** to paste raw filter text from Squiglink or Peace.
-6. **Save to Hardware**:
-   - When you like how it sounds, click **Save to Hardware** in the header to burn it to the chip's EEPROM.
+11. **Save to Hardware**:
+   - When you like how it sounds, click **Save Flash** in the header to burn it permanently to the chip's EEPROM.
 
 ---
 
@@ -192,15 +208,17 @@ For terminal use, scripts, and hotkeys, `tanchjim-ctl` gives full control over a
 | Command | Action | Example |
 | :--- | :--- | :--- |
 | `status` | Query active mode, slot, preamp, mic gain, and 8 bands | `tanchjim-ctl status` |
+| `bypass` | Toggle or query hardware EQ bypass (A/B testing) | `tanchjim-ctl bypass toggle` |
+| `autoeq` | Search and download EQ profiles from AutoEq database | `tanchjim-ctl autoeq "zero 2" --apply` |
 | `set-band` | Configure a specific filter band (0 to 7) | `tanchjim-ctl set-band 0 --freq 60 --gain 4.5 --q 0.71 --type LSQ` |
-| `set-pregain` | Set digital preamp gain (-12 to +12 dB) | `tanchjim-ctl set-pregain -3.5` |
+| `set-pregain` | Set digital preamp gain (-12 to +12 dB, accepts `dB` suffix) | `tanchjim-ctl set-pregain -3.5dB` |
 | `mic-gain` | Inspect or set microphone capture volume | `tanchjim-ctl mic-gain 80%` |
 | `apply` | Apply preset by name, file path, or remote URL | `tanchjim-ctl apply harman_iem` |
 | `save` | Flash working SRAM curve to hardware EEPROM | `tanchjim-ctl save` |
 | `reset` | Zero out all 8 bands to flat 0 dB response | `tanchjim-ctl reset` |
 | `get` | Dump active curve to JSON or AutoEQ text format | `tanchjim-ctl get --format autoeq -o curve.txt` |
 | `presets` | List bundled presets | `tanchjim-ctl presets` |
-| `web` | Launch web equalizer UI | `tanchjim-ctl web --port 8080` |
+| `web` | Launch web equalizer UI | `tanchjim-ctl web --port 8844` |
 | `setup-rules` | Inspect and install udev rules for current OS | `tanchjim-ctl setup-rules` |
 
 ### Practical CLI Examples
@@ -208,6 +226,15 @@ For terminal use, scripts, and hotkeys, `tanchjim-ctl` gives full control over a
 ```bash
 # Check current hardware state
 tanchjim-ctl status
+
+# Quick A/B testing: toggle hardware PEQ on/off
+tanchjim-ctl bypass toggle
+
+# Search AutoEQ database and list matching IEM profiles
+tanchjim-ctl autoeq "aria"
+
+# Download and apply a specific AutoEQ profile directly to hardware
+tanchjim-ctl autoeq "aria" -i 7 --apply
 
 # Apply bundled Harman target and burn to flash
 tanchjim-ctl apply harman_iem
@@ -223,8 +250,8 @@ tanchjim-ctl set-band 0 --freq 70 --gain 4.0 --q 0.70 --type LSQ
 # Notch out a treble sibilance peak on Band 6
 tanchjim-ctl set-band 6 --freq 5800 --gain -3.0 --q 2.50 --type PK
 
-# Attenuate preamp to prevent clipping
-tanchjim-ctl set-pregain -4.0
+# Attenuate preamp to prevent clipping (accepts -4.0 or -4.0dB)
+tanchjim-ctl set-pregain -4.0dB
 
 # Set microphone input volume
 tanchjim-ctl mic-gain 75%

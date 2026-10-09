@@ -574,6 +574,56 @@
       background: rgba(56, 189, 248, 0.08);
     }
 
+    .btn-action.bypass-active {
+      background: rgba(245, 158, 11, 0.15) !important;
+      color: #f59e0b !important;
+      border-color: #f59e0b !important;
+    }
+
+    .user-preset-item {
+      display: inline-flex;
+      align-items: center;
+      background: #0f0f0f;
+      border: 1px solid #202020;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.15s;
+    }
+    .user-preset-item:hover {
+      border-color: #383838;
+      background: #181818;
+    }
+    .user-preset-item .pill {
+      border: none;
+      background: transparent;
+      padding: 5px 8px 5px 12px;
+    }
+    .pill-del-btn {
+      background: transparent;
+      border: none;
+      color: #666666;
+      padding: 5px 8px 5px 2px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .pill-del-btn:hover {
+      color: #ef4444;
+    }
+
+    .generator-panel {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .btn-action:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: var(--border) !important;
+    }
+
     .toast {
       font-size: 0.75rem;
       font-family: var(--font-mono);
@@ -699,8 +749,17 @@
       <!-- Matrix Canvas Card -->
       <div class="card">
         <div class="card-header">
-          <span class="card-label">Response Curve</span>
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="card-label">Response Curve</span>
+            <select id="targetCurveSelect" class="btn-action" style="padding:3px 8px; font-size:0.72rem; background:var(--card-inner); border-color:var(--border);">
+              <option value="none">Target: None</option>
+              <option value="harman2019">Target: Harman IE 2019</option>
+              <option value="ief">Target: IEF Neutral</option>
+              <option value="diffuse">Target: Diffuse Field (-10dB)</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn-action" id="abBypassBtn" title="Toggle Hardware Bypass (Spacebar)">A/B Bypass: OFF</button>
             <button class="btn-connect" id="connectHidBtn">Connect HID</button>
             <button class="btn-action primary" id="burnFlashBtn">Save Flash</button>
           </div>
@@ -708,11 +767,11 @@
 
         <div class="graph-outer" id="graphOuter">
           <canvas id="eqCanvas"></canvas>
-          <div class="graph-hint">Drag: Freq &amp; Gain | Scroll: Q</div>
+          <div class="graph-hint">Drag: Freq &amp; Gain | Scroll: Q | Space: A/B Bypass</div>
         </div>
       </div>
 
-      <!-- Right Info Card -->
+      <!-- Right Info Card & Audio Tools -->
       <div class="card info-card">
         <div class="info-block">
           <span class="info-sub">CHIP</span>
@@ -724,6 +783,40 @@
           <span class="info-val" id="infoConnVal">Disconnected</span>
           <span class="info-desc" id="infoConnDesc">Click Connect to attach</span>
         </div>
+
+        <!-- Tone / Noise Generator -->
+        <div class="generator-panel">
+          <div class="sidebar-section-title" style="margin-bottom:8px; padding:0;">Tone / Noise Generator</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; gap:6px;">
+              <select id="genSignalType" class="btn-action" style="flex:1; padding:4px 6px; font-size:0.75rem; background:var(--card-inner); border-color:var(--border);">
+                <option value="pink">Pink Noise</option>
+                <option value="sine">Sine Tone</option>
+                <option value="sweep">Sine Sweep (20-20k)</option>
+              </select>
+              <button class="btn-action" id="genPlayBtn" style="min-width:65px;">▶ Play</button>
+            </div>
+
+            <div id="genFreqRow" style="display:none; flex-direction:column; gap:3px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted); font-family:var(--font-mono);">
+                <span>Freq</span>
+                <span id="genFreqDisplay">1000 Hz</span>
+              </div>
+              <input type="range" id="genFreqSlider" min="20" max="20000" step="1" value="1000">
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.70rem; color:var(--text-muted); cursor:pointer; margin-top:2px;">
+                <input type="checkbox" id="genTrackBand"> Track active band
+              </label>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted); font-family:var(--font-mono);">
+                <span>Volume</span>
+                <span id="genVolDisplay">-22 dB</span>
+              </div>
+              <input type="range" id="genVolSlider" min="-48" max="-6" step="1" value="-22">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -734,7 +827,9 @@
           <div class="indicator-cyan"></div>
           <span class="section-title">Parametric Bands</span>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn-action" id="undoBtn" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+          <button class="btn-action" id="redoBtn" title="Redo (Ctrl+Y)" disabled>↷ Redo</button>
           <button class="btn-action" id="resetFlatBtn">Reset Flat</button>
           <button class="btn-action" id="loadPresetFileBtn">Load File</button>
           <button class="btn-action" id="savePresetFileBtn">Save File</button>
@@ -781,6 +876,7 @@
             <button class="preset-cat-tab" data-cat="community">Community</button>
             <button class="preset-cat-tab" data-cat="other-iems">Other IEMs</button>
             <button class="preset-cat-tab" data-cat="reference">Reference</button>
+            <button class="preset-cat-tab" data-cat="custom">My Presets</button>
           </div>
         </div>
         <div class="toast" id="toastMsg">Ready. Click Connect to read active filters.</div>
@@ -861,6 +957,12 @@
         <button class="pill" data-preset="vocal">Vocal Forward</button>
         <button class="pill" data-preset="treble">Treble Tame</button>
         <button class="pill" data-preset="flat">Flat Neutral</button>
+      </div>
+
+      <!-- My Presets Category -->
+      <div class="preset-pill-group" id="cat-custom" style="display:none;">
+        <button class="pill" id="saveCustomPresetBtn" style="border-style:dashed; color:var(--accent); border-color:rgba(56, 189, 248, 0.4);">+ Save Current</button>
+        <div id="customPresetsList" style="display:inline-flex; gap:6px; flex-wrap:wrap;"></div>
       </div>
     </div>
   </main>
@@ -952,6 +1054,317 @@
         { freq: 10000, gain: 0.0, q: 1.0, type: "PK" }
       ]
     };
+
+    let isBypass = false;
+
+    // Target Curve Definitions & Interpolation
+    const TARGET_CURVES = {
+      none: null,
+      harman2019: [
+        { f: 20, db: 8.5 }, { f: 40, db: 8.2 }, { f: 80, db: 6.8 }, { f: 150, db: 3.5 },
+        { f: 300, db: 1.0 }, { f: 800, db: 0.0 }, { f: 1000, db: 0.0 }, { f: 2000, db: 5.5 },
+        { f: 3000, db: 9.0 }, { f: 4000, db: 6.5 }, { f: 6000, db: 1.5 }, { f: 8000, db: 3.5 },
+        { f: 10000, db: 2.0 }, { f: 14000, db: -2.0 }, { f: 20000, db: -7.0 }
+      ],
+      ief: [
+        { f: 20, db: 0.0 }, { f: 100, db: 0.0 }, { f: 200, db: 0.0 }, { f: 500, db: 0.0 },
+        { f: 1000, db: 0.0 }, { f: 2000, db: 4.5 }, { f: 3000, db: 8.0 }, { f: 4500, db: 5.0 },
+        { f: 6000, db: 0.5 }, { f: 8000, db: 2.0 }, { f: 10000, db: 0.0 }, { f: 15000, db: -4.0 },
+        { f: 20000, db: -8.0 }
+      ],
+      diffuse: [
+        { f: 20, db: 0.0 }, { f: 100, db: 0.0 }, { f: 500, db: 0.0 }, { f: 1000, db: 0.0 },
+        { f: 2000, db: 5.0 }, { f: 3000, db: 11.5 }, { f: 4000, db: 7.0 }, { f: 6000, db: 2.5 },
+        { f: 8000, db: 4.5 }, { f: 10000, db: 0.0 }, { f: 15000, db: -4.0 }, { f: 20000, db: -10.0 }
+      ]
+    };
+
+    function evalTargetCurve(f, points) {
+      if (!points || points.length === 0) return 0;
+      if (f <= points[0].f) return points[0].db;
+      if (f >= points[points.length - 1].f) return points[points.length - 1].db;
+      const logF = Math.log10(f);
+      for (let i = 0; i < points.length - 1; i++) {
+        if (f >= points[i].f && f <= points[i + 1].f) {
+          const l1 = Math.log10(points[i].f);
+          const l2 = Math.log10(points[i + 1].f);
+          const t = (logF - l1) / (l2 - l1);
+          return points[i].db + t * (points[i + 1].db - points[i].db);
+        }
+      }
+      return 0;
+    }
+
+    // Undo / Redo History Stack
+    const historyStack = [];
+    let historyIdx = -1;
+    const MAX_HISTORY = 25;
+
+    function pushHistory() {
+      const snap = {
+        pregain: state.pregain,
+        bands: JSON.parse(JSON.stringify(state.bands))
+      };
+      if (historyIdx >= 0) {
+        const cur = historyStack[historyIdx];
+        if (cur.pregain === snap.pregain && JSON.stringify(cur.bands) === JSON.stringify(snap.bands)) {
+          return;
+        }
+      }
+      historyStack.splice(historyIdx + 1);
+      historyStack.push(snap);
+      if (historyStack.length > MAX_HISTORY) {
+        historyStack.shift();
+      }
+      historyIdx = historyStack.length - 1;
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      const undoBtn = document.getElementById("undoBtn");
+      const redoBtn = document.getElementById("redoBtn");
+      if (undoBtn) undoBtn.disabled = historyIdx <= 0;
+      if (redoBtn) redoBtn.disabled = historyIdx >= historyStack.length - 1;
+    }
+
+    async function undo() {
+      if (historyIdx > 0) {
+        historyIdx--;
+        const snap = historyStack[historyIdx];
+        state.pregain = snap.pregain;
+        state.bands = JSON.parse(JSON.stringify(snap.bands));
+        renderUI();
+        updateUndoRedoButtons();
+        document.getElementById("toastMsg").textContent = `[Undo] Restored step ${historyIdx + 1}/${historyStack.length}.`;
+        if (hidDevice && hidDevice.opened) await webhidWriteAll();
+        else if (useBackend) syncBackend();
+      }
+    }
+
+    async function redo() {
+      if (historyIdx < historyStack.length - 1) {
+        historyIdx++;
+        const snap = historyStack[historyIdx];
+        state.pregain = snap.pregain;
+        state.bands = JSON.parse(JSON.stringify(snap.bands));
+        renderUI();
+        updateUndoRedoButtons();
+        document.getElementById("toastMsg").textContent = `[Redo] Advanced to step ${historyIdx + 1}/${historyStack.length}.`;
+        if (hidDevice && hidDevice.opened) await webhidWriteAll();
+        else if (useBackend) syncBackend();
+      }
+    }
+
+    // Custom Presets Management (localStorage)
+    function loadUserPresets() {
+      try {
+        return JSON.parse(localStorage.getItem("tanchjim_user_presets") || "[]");
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveUserPresets(arr) {
+      try {
+        localStorage.setItem("tanchjim_user_presets", JSON.stringify(arr));
+      } catch (e) {}
+    }
+
+    function renderUserPresetsUI() {
+      const listEl = document.getElementById("customPresetsList");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+      const presets = loadUserPresets();
+      if (presets.length === 0) {
+        const hint = document.createElement("span");
+        hint.style.cssText = "font-size:0.72rem; color:var(--text-dim); font-family:var(--font-mono); padding:4px 0;";
+        hint.textContent = "No saved custom presets yet.";
+        listEl.appendChild(hint);
+        return;
+      }
+      presets.forEach((p, idx) => {
+        const item = document.createElement("div");
+        item.className = "user-preset-item";
+
+        const loadBtn = document.createElement("button");
+        loadBtn.className = "pill";
+        loadBtn.textContent = p.name;
+        loadBtn.title = `Saved on ${p.date || 'Custom'}`;
+        loadBtn.addEventListener("click", () => {
+          state.pregain = p.pregain !== undefined ? p.pregain : 0.0;
+          state.bands = JSON.parse(JSON.stringify(p.bands));
+          pushHistory();
+          renderUI();
+          document.querySelectorAll(".pill").forEach(el => el.classList.remove("active"));
+          loadBtn.classList.add("active");
+          document.getElementById("toastMsg").textContent = `[OK] Applied custom preset '${p.name}'.`;
+          if (hidDevice && hidDevice.opened) webhidWriteAll();
+          else if (useBackend) syncBackend();
+        });
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "pill-del-btn";
+        delBtn.textContent = "×";
+        delBtn.title = "Delete preset";
+        delBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const cur = loadUserPresets();
+          cur.splice(idx, 1);
+          saveUserPresets(cur);
+          renderUserPresetsUI();
+        });
+
+        item.appendChild(loadBtn);
+        item.appendChild(delBtn);
+        listEl.appendChild(item);
+      });
+    }
+
+    // Audio Tone & Pink Noise Generator (Web Audio API)
+    let audioCtx = null;
+    let genOsc = null;
+    let genGain = null;
+    let genBufferSource = null;
+    let genIsPlaying = false;
+    let pinkNoiseBuffer = null;
+    let sweepTimer = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function createPinkNoiseBuffer(ctx) {
+      const bufferSize = ctx.sampleRate * 5;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+      return buffer;
+    }
+
+    function startGenerator() {
+      const ctx = getAudioContext();
+      stopGenerator();
+
+      const type = document.getElementById("genSignalType").value;
+      const volDb = parseFloat(document.getElementById("genVolSlider").value);
+      const gainVal = Math.pow(10, volDb / 20);
+
+      genGain = ctx.createGain();
+      genGain.gain.setValueAtTime(gainVal, ctx.currentTime);
+      genGain.connect(ctx.destination);
+
+      if (type === "pink") {
+        if (!pinkNoiseBuffer) {
+          pinkNoiseBuffer = createPinkNoiseBuffer(ctx);
+        }
+        genBufferSource = ctx.createBufferSource();
+        genBufferSource.buffer = pinkNoiseBuffer;
+        genBufferSource.loop = true;
+        genBufferSource.connect(genGain);
+        genBufferSource.start();
+      } else if (type === "sine") {
+        const freq = parseFloat(document.getElementById("genFreqSlider").value);
+        genOsc = ctx.createOscillator();
+        genOsc.type = "sine";
+        genOsc.frequency.setValueAtTime(freq, ctx.currentTime);
+        genOsc.connect(genGain);
+        genOsc.start();
+      } else if (type === "sweep") {
+        genOsc = ctx.createOscillator();
+        genOsc.type = "sine";
+        genOsc.connect(genGain);
+        genOsc.start();
+        function loopSweep() {
+          if (!genOsc) return;
+          const now = ctx.currentTime;
+          genOsc.frequency.cancelScheduledValues(now);
+          genOsc.frequency.setValueAtTime(20, now);
+          genOsc.frequency.exponentialRampToValueAtTime(20000, now + 5.0);
+          sweepTimer = setTimeout(loopSweep, 5200);
+        }
+        loopSweep();
+      }
+
+      genIsPlaying = true;
+      const playBtn = document.getElementById("genPlayBtn");
+      playBtn.textContent = "⏹ Stop";
+      playBtn.classList.add("primary");
+    }
+
+    function stopGenerator() {
+      if (sweepTimer) { clearTimeout(sweepTimer); sweepTimer = null; }
+      if (genOsc) {
+        try { genOsc.stop(); genOsc.disconnect(); } catch (e) {}
+        genOsc = null;
+      }
+      if (genBufferSource) {
+        try { genBufferSource.stop(); genBufferSource.disconnect(); } catch (e) {}
+        genBufferSource = null;
+      }
+      if (genGain) {
+        try { genGain.disconnect(); } catch (e) {}
+        genGain = null;
+      }
+      genIsPlaying = false;
+      const playBtn = document.getElementById("genPlayBtn");
+      if (playBtn) {
+        playBtn.textContent = "▶ Play";
+        playBtn.classList.remove("primary");
+      }
+    }
+
+    async function setBypassState(bypass) {
+      isBypass = bypass;
+      const btn = document.getElementById("abBypassBtn");
+      if (btn) {
+        if (isBypass) {
+          btn.textContent = "A/B Bypass: ACTIVE (RAW)";
+          btn.classList.add("bypass-active");
+          document.getElementById("toastMsg").textContent = "[A/B] Hardware PEQ Bypassed (Raw Sound).";
+        } else {
+          btn.textContent = "A/B Bypass: OFF";
+          btn.classList.remove("bypass-active");
+          document.getElementById("toastMsg").textContent = "[A/B] Hardware PEQ Active.";
+        }
+      }
+
+      if (hidDevice && hidDevice.opened) {
+        try {
+          const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_WRITE, 0, isBypass ? 0x02 : 0x03, 0, 0, 0]);
+          await hidDevice.sendReport(REPORT_ID, slotPkt);
+        } catch (e) {
+          console.error("WebHID bypass write error:", e);
+        }
+      } else if (useBackend) {
+        try {
+          await fetch("/api/bypass", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bypass: isBypass })
+          });
+        } catch (e) {
+          console.error("Backend bypass write error:", e);
+        }
+      }
+      drawSquiglinkGraph();
+    }
 
     const PRESETS = {
       // Official Tanchjim Factory Stock Presets
@@ -1815,7 +2228,12 @@
 
     async function webhidReadAll() {
       const slotPkt = new Uint8Array([0x24, 0, 0, 0, CMD_READ, 0, 0x03, 0, 0, 0]);
-      await sendReportAsync(0x24, CMD_READ, slotPkt);
+      try {
+        const slotResp = await sendReportAsync(0x24, CMD_READ, slotPkt);
+        if (slotResp && slotResp.length >= 7) {
+          setBypassState(slotResp[6] !== 0x03);
+        }
+      } catch (e) {}
 
       const prePkt = new Uint8Array([0x66, 0, 0, 0, CMD_READ, 0, 0, 0, 0, 0]);
       const preResp = await sendReportAsync(0x66, CMD_READ, prePkt);
@@ -1848,6 +2266,7 @@
       }
 
       renderUI();
+      pushHistory();
     }
 
     function roundEven(n) {
@@ -2114,13 +2533,47 @@
         ctx.stroke();
       }
 
+      // 6.5 Target Curve Overlay (if selected)
+      const targetSel = document.getElementById("targetCurveSelect");
+      const targetKey = targetSel ? targetSel.value : "none";
+      const targetPts = TARGET_CURVES[targetKey];
+      if (targetPts) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.45)";
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([5, 4]);
+        for (let px = bounds.x; px <= bounds.x + bounds.w; px += 2) {
+          const freq = fForX(px, bounds);
+          const db = evalTargetCurve(freq, targetPts);
+          const y = yForDb(db, bounds);
+          if (px === bounds.x) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Bypass flat reference line when active
+      if (isBypass) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([6, 4]);
+        const y0 = yForDb(0, bounds);
+        ctx.moveTo(bounds.x, y0);
+        ctx.lineTo(bounds.x + bounds.w, y0);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       // 7. Total Frequency Response Curve (Glowing White / Cyan line)
       const fs = 48000;
       ctx.beginPath();
-      ctx.strokeStyle = "#ffffff";
+      ctx.strokeStyle = isBypass ? "rgba(255, 255, 255, 0.3)" : "#ffffff";
       ctx.lineWidth = 2.2;
-      ctx.shadowColor = "rgba(255, 255, 255, 0.4)";
-      ctx.shadowBlur = 4;
+      ctx.shadowColor = isBypass ? "transparent" : "rgba(255, 255, 255, 0.4)";
+      ctx.shadowBlur = isBypass ? 0 : 4;
 
       for (let px = bounds.x; px <= bounds.x + bounds.w; px += 2) {
         const freq = fForX(px, bounds);
@@ -2133,6 +2586,24 @@
       }
       ctx.stroke();
       ctx.shadowBlur = 0;
+
+      // Bypass Indicator Badge on Canvas
+      if (isBypass) {
+        ctx.save();
+        ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(bounds.x + bounds.w - 145, bounds.y + 8, 135, 22, [4]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#f59e0b";
+        ctx.font = "600 10px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("BYPASS ACTIVE (RAW)", bounds.x + bounds.w - 77, bounds.y + 23);
+        ctx.restore();
+      }
 
       // 9. Interactive Draggable Band Nodes
       state.bands.forEach((b, i) => {
@@ -2254,6 +2725,7 @@
         canvas.style.cursor = "crosshair";
         removeChannelHighlights();
         drawSquiglinkGraph();
+        pushHistory();
       }
     });
 
@@ -2267,6 +2739,7 @@
         state.bands[hit].q = newQ;
         syncBandToInputs(hit);
         drawSquiglinkGraph();
+        pushHistory();
       }
     }, { passive: false });
 
@@ -2278,6 +2751,7 @@
         state.bands[hit].gain = 0.0;
         syncBandToInputs(hit);
         drawSquiglinkGraph();
+        pushHistory();
       }
     });
 
@@ -2309,6 +2783,16 @@
       if (fV) fV.textContent = `${b.freq} Hz`;
       if (gV) gV.textContent = `${b.gain > 0 ? '+' : ''}${b.gain.toFixed(1)} dB`;
       if (qV) qV.textContent = b.q.toFixed(2);
+
+      // Track active band in Tone Generator if option enabled
+      const trackBand = document.getElementById("genTrackBand");
+      if (trackBand && trackBand.checked && genIsPlaying && genOsc && audioCtx) {
+        const freqSliderGen = document.getElementById("genFreqSlider");
+        const freqDispGen = document.getElementById("genFreqDisplay");
+        if (freqSliderGen) freqSliderGen.value = b.freq;
+        if (freqDispGen) freqDispGen.textContent = `${Math.round(b.freq)} Hz`;
+        genOsc.frequency.setValueAtTime(b.freq, audioCtx.currentTime);
+      }
     }
 
     // Generate channel strip controls for all 8 bands
@@ -2380,11 +2864,17 @@
           drawSquiglinkGraph();
         });
       });
+      document.querySelectorAll(".slider-freq, .slider-gain, .slider-q").forEach(el => {
+        el.addEventListener("change", () => {
+          pushHistory();
+        });
+      });
       document.querySelectorAll(".type-select").forEach(el => {
         el.addEventListener("change", (e) => {
           const idx = e.target.dataset.band;
           state.bands[idx].type = e.target.value;
           drawSquiglinkGraph();
+          pushHistory();
         });
       });
     }
@@ -2400,6 +2890,10 @@
       state.pregain = parseFloat(e.target.value);
       document.getElementById("pregainVal").textContent = `${state.pregain > 0 ? '+' : ''}${state.pregain.toFixed(1)} dB`;
       drawSquiglinkGraph();
+    });
+
+    document.getElementById("pregainSlider").addEventListener("change", () => {
+      pushHistory();
     });
 
     // Connection status and WebHID/backend handshakes
@@ -2422,9 +2916,13 @@
           state.bands = json.data.bands.map(b => ({
             freq: b.freq, gain: b.gain, q: b.q, type: b.type
           }));
+          if (json.data.bypass !== undefined) {
+            setBypassState(json.data.bypass);
+          }
           useBackend = true;
           setConnectedUI("Backend");
           renderUI();
+          pushHistory();
           return true;
         }
       } catch (err) {}
@@ -2491,10 +2989,13 @@
         document.querySelectorAll(".preset-cat-tab").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         const cat = tab.dataset.cat;
-        ["stock", "gaming", "community", "other-iems", "reference"].forEach(c => {
+        ["stock", "gaming", "community", "other-iems", "reference", "custom"].forEach(c => {
           const el = document.getElementById(`cat-${c}`);
           if (el) el.style.display = (c === cat) ? "flex" : "none";
         });
+        if (cat === "custom") {
+          renderUserPresetsUI();
+        }
       });
     });
 
@@ -2507,6 +3008,7 @@
         if (PRESETS[key]) {
           state.pregain = PRESETS[key].pregain;
           state.bands = JSON.parse(JSON.stringify(PRESETS[key].bands));
+          pushHistory();
           renderUI();
           document.getElementById("toastMsg").textContent = `Loaded preset: ${PRESETS[key].name || btn.textContent}`;
         }
@@ -2539,6 +3041,7 @@
       const p = PRESETS.flat;
       state.pregain = p.pregain;
       state.bands = JSON.parse(JSON.stringify(p.bands));
+      pushHistory();
       renderUI();
       document.getElementById("toastMsg").textContent = "Reset to flat 0 dB.";
     });
@@ -2582,7 +3085,7 @@
         const l = line.trim();
         if (!l || l.startsWith("#") || l.startsWith("//")) continue;
 
-        const preM = l.match(/Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*dB/i);
+        const preM = l.match(/Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*(?:dB)?/i);
         if (preM) {
           pregain = parseFloat(preM[1]);
           continue;
@@ -2598,7 +3101,7 @@
             rest = statusM[2].trim();
           }
 
-          const paramsM = rest.match(/^(?:(PK|LSQ|HSQ|LSC|HSC|PEAK)\s+)?(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
+          const paramsM = rest.match(/^(?:(PK|LSQ|HSQ|LSC|HSC|PEAK|LOW_SHELF|HIGH_SHELF|LS|HS)\s+)?(?:Fc\s+)?(\d+(?:\.\d+)?)\s*(?:Hz)?\s*(?:Gain\s+)?([+-]?\d+(?:\.\d+)?)\s*(?:dB)?\s*(?:Q\s+)?(\d+(?:\.\d+)?)?/i);
           const hasParams = paramsM && paramsM[2] !== undefined && paramsM[3] !== undefined;
 
           if (isOff && !hasParams) {
@@ -2608,7 +3111,7 @@
 
           if (hasParams) {
             let t = (paramsM[1] || "PK").toUpperCase();
-            t = (t === "LSC" || t === "LSQ") ? "LSQ" : ((t === "HSC" || t === "HSQ") ? "HSQ" : "PK");
+            t = (["LSC", "LSQ", "LOW_SHELF", "LS"].includes(t)) ? "LSQ" : ((["HSC", "HSQ", "HIGH_SHELF", "HS"].includes(t)) ? "HSQ" : "PK");
             bands.push({
               freq: parseFloat(paramsM[2]),
               gain: isOff ? 0.0 : parseFloat(paramsM[3]),
@@ -2624,6 +3127,7 @@
         for (let i = 0; i < 8; i++) {
           state.bands[i] = i < bands.length ? bands[i] : { freq: 1000, gain: 0, q: 1.0, type: "PK" };
         }
+        pushHistory();
         renderUI();
         document.getElementById("toastMsg").textContent = `[OK] Imported ${Math.min(8, bands.length)} filter bands from ${sourceName || "text"}.`;
         return true;
@@ -2661,6 +3165,7 @@
                 state.bands[i] = { freq: 1000, gain: 0, q: 1.0, type: "PK" };
               }
             }
+            pushHistory();
             renderUI();
             document.getElementById("toastMsg").textContent = `[OK] Loaded preset from ${file.name}`;
             return;
@@ -2788,9 +3293,116 @@
 
     window.addEventListener("resize", drawSquiglinkGraph);
 
+    // Target Curve select listener
+    const targetCurveSelect = document.getElementById("targetCurveSelect");
+    if (targetCurveSelect) {
+      targetCurveSelect.addEventListener("change", drawSquiglinkGraph);
+    }
+
+    // A/B Bypass button listener
+    const abBypassBtn = document.getElementById("abBypassBtn");
+    if (abBypassBtn) {
+      abBypassBtn.addEventListener("click", () => setBypassState(!isBypass));
+    }
+
+    // Undo / Redo button listeners
+    const undoBtn = document.getElementById("undoBtn");
+    if (undoBtn) undoBtn.addEventListener("click", undo);
+    const redoBtn = document.getElementById("redoBtn");
+    if (redoBtn) redoBtn.addEventListener("click", redo);
+
+    // Tone & Noise Generator listeners
+    const genPlayBtn = document.getElementById("genPlayBtn");
+    if (genPlayBtn) {
+      genPlayBtn.addEventListener("click", () => {
+        if (genIsPlaying) {
+          stopGenerator();
+        } else {
+          startGenerator();
+        }
+      });
+    }
+
+    const genSignalType = document.getElementById("genSignalType");
+    if (genSignalType) {
+      genSignalType.addEventListener("change", (e) => {
+        const isSine = e.target.value === "sine";
+        const row = document.getElementById("genFreqRow");
+        if (row) row.style.display = isSine ? "flex" : "none";
+        if (genIsPlaying) startGenerator();
+      });
+    }
+
+    const genFreqSlider = document.getElementById("genFreqSlider");
+    if (genFreqSlider) {
+      genFreqSlider.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById("genFreqDisplay").textContent = `${Math.round(val)} Hz`;
+        if (genOsc && audioCtx && genIsPlaying) {
+          genOsc.frequency.setValueAtTime(val, audioCtx.currentTime);
+        }
+      });
+    }
+
+    const genVolSlider = document.getElementById("genVolSlider");
+    if (genVolSlider) {
+      genVolSlider.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById("genVolDisplay").textContent = `${val} dB`;
+        if (genGain && audioCtx && genIsPlaying) {
+          genGain.gain.setValueAtTime(Math.pow(10, val / 20), audioCtx.currentTime);
+        }
+      });
+    }
+
+    // Custom Preset Save Button
+    const saveCustomBtn = document.getElementById("saveCustomPresetBtn");
+    if (saveCustomBtn) {
+      saveCustomBtn.addEventListener("click", () => {
+        const name = prompt("Enter a name for this preset:", "My Custom Tuning");
+        if (!name || !name.trim()) return;
+        const cur = loadUserPresets();
+        cur.push({
+          name: name.trim(),
+          date: new Date().toLocaleDateString(),
+          pregain: state.pregain,
+          bands: JSON.parse(JSON.stringify(state.bands))
+        });
+        saveUserPresets(cur);
+        renderUserPresetsUI();
+        document.getElementById("toastMsg").textContent = `[OK] Saved custom preset '${name.trim()}'.`;
+      });
+    }
+
+    // Keyboard shortcuts: Space (A/B Bypass), Ctrl+Z (Undo), Ctrl+Y (Redo)
+    window.addEventListener("keydown", (e) => {
+      const tag = document.activeElement ? document.activeElement.tagName : "";
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        setBypassState(!isBypass);
+        return;
+      }
+
+      if (e.ctrlKey && !e.shiftKey && e.code === "KeyZ") {
+        e.preventDefault();
+        undo();
+        return;
+      }
+
+      if ((e.ctrlKey && e.code === "KeyY") || (e.ctrlKey && e.shiftKey && e.code === "KeyZ")) {
+        e.preventDefault();
+        redo();
+        return;
+      }
+    });
+
     // Initial render
     renderUI();
+    pushHistory();
     loadMicGain();
+    renderUserPresetsUI();
     tryLocalBackendAutoConnect();
   </script>
 </body>
