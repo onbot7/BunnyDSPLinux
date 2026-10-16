@@ -1,4 +1,6 @@
 # Tanchjim Bunny DSP Controller for Linux (KT0210)
+> [!NOTE]
+> This code was generated with the assistance of AI and may contain errors. 
 <p align="center">
   <img src="assets/ui-screenshot.png" alt="Equalizer Interface" width="900">
 </p>
@@ -17,6 +19,7 @@ Tanchjim only provides an Android APK to manage their DSP cable. There is no off
 You can also **burn your EQ profile straight into the cable's onboard EEPROM flash**. Once saved, the DSP runs your tuning in hardware wherever you plug it in (iPhone 15/16, Android, Mac, Windows, Steam Deck) without needing any background EQ software or drivers.
 
 ##### similar [DevicePEQ by jeromeof](https://github.com/jeromeof/devicePEQ)
+
 ---
 
 ## Features
